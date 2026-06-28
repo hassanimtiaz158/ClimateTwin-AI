@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Layout from './components/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -17,6 +17,11 @@ function LoadingSpinner() {
       <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
     </div>
   );
+}
+
+function ScenarioBuilderWrapper() {
+  const { id } = useParams();
+  return <ScenarioBuilder key={id || 'new'} />;
 }
 
 function NotFound() {
@@ -43,8 +48,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route element={<Layout />}>
-            <Route path="/scenario/new" element={<Suspense fallback={<LoadingSpinner />}><ScenarioBuilder /></Suspense>} />
-            <Route path="/scenario/:id" element={<Suspense fallback={<LoadingSpinner />}><ScenarioBuilder /></Suspense>} />
+            <Route path="/scenario/new" element={<Suspense fallback={<LoadingSpinner />}><ScenarioBuilderWrapper /></Suspense>} />
+            <Route path="/scenario/:id" element={<Suspense fallback={<LoadingSpinner />}><ScenarioBuilderWrapper /></Suspense>} />
             <Route path="/dashboard/:runId" element={<Suspense fallback={<LoadingSpinner />}><Dashboard /></Suspense>} />
             <Route path="/compare" element={<Suspense fallback={<LoadingSpinner />}><Compare /></Suspense>} />
             <Route path="/history" element={<Suspense fallback={<LoadingSpinner />}><History /></Suspense>} />
