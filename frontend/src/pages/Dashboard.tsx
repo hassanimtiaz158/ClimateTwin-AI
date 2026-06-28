@@ -32,6 +32,7 @@ import {
   SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { api, ApiError } from '../services/api';
+import { exportJSON, exportHTML } from '../services/exportReport';
 import { useStore } from '../store/useStore';
 import type { SimulationResults } from '../types';
 
@@ -706,16 +707,28 @@ export default function Dashboard() {
           <div className="text-sm text-gray-500">
             Run ID: <span className="font-mono">{runId?.slice(0, 8)}...</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => results && exportJSON(results)}
+              className="px-4 py-2 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors text-sm font-medium"
+            >
+              Export JSON
+            </button>
+            <button
+              onClick={() => results && exportHTML(results)}
+              className="px-4 py-2 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors text-sm font-medium"
+            >
+              Export Report
+            </button>
             <Link
               to="/scenario/new"
-              className="px-5 py-2.5 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors text-sm font-medium"
+              className="px-4 py-2 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors text-sm font-medium"
             >
               New Scenario
             </Link>
             <Link
               to={`/recommendations/${runId}`}
-              className="px-5 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors text-sm font-medium"
+              className="px-5 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors text-sm font-medium"
             >
               View Full Analysis
             </Link>

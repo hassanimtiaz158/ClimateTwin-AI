@@ -26,6 +26,7 @@ import {
   SparklesIcon,
   FireIcon,
 } from '@heroicons/react/24/outline';
+import { exportComparisonJSON, exportComparisonHTML, type ComparisonData } from '../services/exportReport';
 
 // ── Predefined Scenarios ─────────────────────────────────────
 const PRESET_SCENARIOS = [
@@ -253,6 +254,36 @@ export default function Compare() {
     return Math.max(0, Math.min(100, score));
   };
 
+  // Export comparison data
+  const buildComparisonData = (): ComparisonData => ({
+    scenarios: selectedScenarios.map((id) => {
+      const scenario = PRESET_SCENARIOS.find((s) => s.id === id)!;
+      const summary = getScenarioSummary(id);
+      return {
+        name: scenario.name,
+        city: scenario.id === 'custom' ? 'Custom' : scenario.name,
+        country: '',
+        targetYear: 2035,
+        metrics: {
+          temperature_change: summary?.tempChange ?? 0,
+          co2_change: summary?.co2Change ?? 0,
+          air_quality_change: 0,
+          forest_cover_change: summary?.forestChange ?? 0,
+          biodiversity_change: 0,
+          water_stress_change: 0,
+          heatwave_change: summary?.heatwaveChange ?? 0,
+          flood_risk_change: 0,
+        },
+      };
+    }),
+  });
+
+  const handleExportComparison = (format: 'json' | 'html') => {
+    const data = buildComparisonData();
+    if (format === 'json') exportComparisonJSON(data);
+    else exportComparisonHTML(data);
+  };
+
   // Merge projections for comparison charts
   const mergedTemperatureData = useMemo(() => {
     if (selectedScenarios.length === 0) return [];
@@ -362,10 +393,24 @@ export default function Compare() {
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Compare <span className="text-gradient-green">Futures</span>
           </h1>
-          <p className="text-gray-500 max-w-2xl mx-auto text-lg">
+          <p className="text-gray-500 max-w-2xl mx-auto text-lg mb-6">
             See how different climate action levels impact our planet over the next decade.
             Choose scenarios to compare and discover the power of action.
           </p>
+          <div className="flex items-center justify-center gap-3">
+            <button
+              onClick={() => handleExportComparison('json')}
+              className="px-4 py-2 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors text-sm font-medium bg-white shadow-card"
+            >
+              Export JSON
+            </button>
+            <button
+              onClick={() => handleExportComparison('html')}
+              className="px-4 py-2 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors text-sm font-medium bg-white shadow-card"
+            >
+              Export Report
+            </button>
+          </div>
         </div>
 
         {/* ── Scenario Selector ────────────────────────────── */}
