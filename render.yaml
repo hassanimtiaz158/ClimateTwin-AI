@@ -1,0 +1,52 @@
+# ===========================
+# Render.com — Blueprint
+# ===========================
+# Deploy with: render blueprint apply
+# Or manually: create Web Service (backend) + Static Site (frontend)
+
+services:
+  # ── Backend API ────────────────────────────────────────────
+  - type: web
+    name: climatetwin-api
+    runtime: python
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt && alembic upgrade head
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: climatetwin-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: '["https://climatetwin.vercel.app"]'
+      - key: DEBUG
+        value: "false"
+      - key: PYTHON_VERSION
+        value: "3.12"
+      - key: PYTHON_BUILD_DEPS
+        value: "gcc libpq-dev"
+
+  # ── PostgreSQL Database ────────────────────────────────────
+  - type: postgresql
+    name: climatetwin-db
+    plan: free
+    database: climatetwin
+    ipAllowList: []
+
+  # ── Frontend (alternative: use Vercel) ─────────────────────
+  # If deploying frontend on Render instead of Vercel:
+  # - type: web
+  #   name: climatetwin-frontend
+  #   runtime: static
+  #   plan: free
+  #   rootDir: frontend
+  #   buildCommand: npm install && npm run build
+  #   staticPublishPath: dist
+  #   envVars:
+  #     - key: VITE_API_BASE_URL
+  #       value: https://climatetwin-api.onrender.com/api

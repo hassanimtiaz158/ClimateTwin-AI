@@ -1,14 +1,19 @@
 version: "3.9"
 
+# Development docker-compose — run with:
+#   docker compose up -d --build
+#
+# Production: see docker-compose.prod.yml
+
 services:
   # ---- PostgreSQL Database ----
   db:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     container_name: climatetwin_db
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-climatetwin}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpassword}
       POSTGRES_DB: ${POSTGRES_DB:-climatetwin}
     ports:
       - "5432:5432"
@@ -16,19 +21,6 @@ services:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-climatetwin}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # ---- Redis Cache (Optional) ----
-  redis:
-    image: redis:7-alpine
-    container_name: climatetwin_redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -43,18 +35,14 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-climatetwin}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-climatetwin}
-      REDIS_URL: redis://redis:6379/0
-      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
-      DEBUG: ${DEBUG:-true}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-climatetwin}:${POSTGRES_PASSWORD:-devpassword}@db:5432/${POSTGRES_DB:-climatetwin}
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-change-in-production}
+      DEBUG: "true"
     volumes:
-      - ./backend:/app
+      - ./backend/app:/app/app
       - ./datasets:/app/datasets
-      - ./models:/app/models
     depends_on:
       db:
-        condition: service_healthy
-      redis:
         condition: service_healthy
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
@@ -68,12 +56,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_API_BASE_URL=http://localhost:8000/api
+      VITE_API_BASE_URL: http://localhost:8000/api
     depends_on:
       - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
 
 volumes:
   postgres_data:

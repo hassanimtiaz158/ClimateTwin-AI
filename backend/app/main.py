@@ -36,6 +36,19 @@ async def lifespan(_app: FastAPI):
     """Startup / shutdown lifecycle hooks."""
     logger.info("ClimateTwin AI API starting …  DEBUG=%s", settings.DEBUG)
 
+    # ── Production safety checks ────────────────────────────
+    if not settings.DEBUG:
+        if not settings.SECRET_KEY:
+            logger.critical(
+                "SECRET_KEY is empty in production! "
+                "JWT tokens will be insecure. Set SECRET_KEY env var."
+            )
+        if not settings.DATABASE_URL.startswith("postgresql"):
+            logger.warning(
+                "Using SQLite in production. "
+                "Switch to PostgreSQL for persistent storage."
+            )
+
     # Dev convenience: auto-create tables.  Use Alembic in production.
     if settings.DEBUG:
         try:

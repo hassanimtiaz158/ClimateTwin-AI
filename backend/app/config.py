@@ -6,11 +6,25 @@ All settings are loaded from environment variables (or a .env file).
 
 from __future__ import annotations
 
+import json
+import os
 from functools import lru_cache
 from typing import List
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _parse_cors(origins: str | list) -> list[str]:
+    """Parse CORS_ORIGINS from JSON string, comma-separated string, or list."""
+    if isinstance(origins, list):
+        return origins
+    if isinstance(origins, str):
+        s = origins.strip()
+        if s.startswith("["):
+            return json.loads(s)
+        return [o.strip() for o in s.split(",") if o.strip()]
+    return []
 
 
 class Settings(BaseSettings):
@@ -25,8 +39,8 @@ class Settings(BaseSettings):
 
     # ── Database ──────────────────────────────────────────────
     DATABASE_URL: str = Field(
-        default="postgresql://user:password@localhost:5432/climatetwin",
-        description="PostgreSQL connection string (sync or async prefix).",
+        default="sqlite+aiosqlite:///./climatetwin.db",
+        description="Database connection string. Supports PostgreSQL and SQLite.",
     )
 
     # ── Redis (optional) ─────────────────────────────────────
@@ -39,7 +53,7 @@ class Settings(BaseSettings):
     # ── Security ─────────────────────────────────────────────
     SECRET_KEY: str = Field(
         default="",
-        description="JWT signing secret. Must be set in production.",
+        description="JWT signing secret. MUST be set in production.",
     )
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(
         default=30, ge=1, le=1440, description="JWT token lifetime in minutes."
@@ -58,10 +72,16 @@ class Settings(BaseSettings):
             "http://localhost:5173",
             "http://127.0.0.1:3000",
             "http://127.0.0.1:5173",
-            "https://climatetwin.vercel.app",
         ],
-        description="Origins allowed by CORS.",
+        description="Origins allowed by CORS. Accepts JSON array, comma-separated string, or individual env var CORS_ORIGINS_0, CORS_ORIGINS_1, etc.",
     )
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def _parse_cors_origins(cls, v: str | list | None) -> list[str]:
+        if v is None:
+            return []
+        return _parse_cors(v)
 
     # ── AI / ML ──────────────────────────────────────────────
     MODEL_PATH: str = Field(
