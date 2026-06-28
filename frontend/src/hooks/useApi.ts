@@ -10,7 +10,7 @@ interface UseApiReturn<T> {
   data: T | null;
   loading: boolean;
   error: Error | null;
-  execute: (...args: unknown[]) => Promise<void>;
+  execute: (...args: unknown[]) => Promise<T | undefined>;
 }
 
 export function useApi<T>(

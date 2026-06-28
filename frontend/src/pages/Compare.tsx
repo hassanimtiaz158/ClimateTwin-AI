@@ -13,14 +13,14 @@ import { api } from '../services/api';
 import type { SimulationResults } from '../types';
 
 export default function Compare() {
-  const [scenarioIds, setScenarioIds] = useState<string[]>(['', '']);
+  const [runIds, setRunIds] = useState<string[]>(['', '']);
   const [results, setResults] = useState<SimulationResults[]>([]);
   const [loading, setLoading] = useState(false);
 
   const colors = ['#0ea5e9', '#22c55e', '#f97316', '#ef4444', '#8b5cf6'];
 
   const handleCompare = async () => {
-    const validIds = scenarioIds.filter((id) => id.trim() !== '');
+    const validIds = runIds.filter((id) => id.trim() !== '');
     if (validIds.length < 2) {
       return;
     }
@@ -38,12 +38,12 @@ export default function Compare() {
   };
 
   const addScenario = () => {
-    setScenarioIds([...scenarioIds, '']);
+    setRunIds([...runIds, '']);
   };
 
   const removeScenario = (index: number) => {
-    if (scenarioIds.length > 2) {
-      setScenarioIds(scenarioIds.filter((_, i) => i !== index));
+    if (runIds.length > 2) {
+      setRunIds(runIds.filter((_, i) => i !== index));
     }
   };
 
@@ -53,22 +53,22 @@ export default function Compare() {
 
       {/* Scenario Selection */}
       <div className="card">
-        <h2 className="text-xl font-semibold mb-4">Select Scenarios to Compare</h2>
+        <h2 className="text-xl font-semibold mb-4">Select Runs to Compare</h2>
         <div className="space-y-3">
-          {scenarioIds.map((id, index) => (
+          {runIds.map((id, index) => (
             <div key={index} className="flex gap-2">
               <input
                 type="text"
                 className="input-field flex-1"
-                placeholder={`Scenario Run ID ${index + 1}`}
+                placeholder={`Simulation Run ID ${index + 1}`}
                 value={id}
                 onChange={(e) => {
-                  const newIds = [...scenarioIds];
+                  const newIds = [...runIds];
                   newIds[index] = e.target.value;
-                  setScenarioIds(newIds);
+                  setRunIds(newIds);
                 }}
               />
-              {scenarioIds.length > 2 && (
+              {runIds.length > 2 && (
                 <button
                   onClick={() => removeScenario(index)}
                   className="btn-secondary text-red-600"
@@ -106,7 +106,7 @@ export default function Compare() {
                   ...Object.fromEntries(
                     results.map((r, idx) => [
                       `scenario_${idx + 1}`,
-                      r.projections[i]?.temperature,
+                      r.projections[i]?.temperature_change,
                     ])
                   ),
                 }))}
@@ -116,14 +116,14 @@ export default function Compare() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                {results.map((r, idx) => (
+                {results.map((_r, idx) => (
                   <Line
                     key={idx}
                     type="monotone"
                     dataKey={`scenario_${idx + 1}`}
                     stroke={colors[idx % colors.length]}
                     strokeWidth={2}
-                    name={r.scenario.name || `Scenario ${idx + 1}`}
+                    name={`Scenario ${idx + 1}`}
                   />
                 ))}
               </LineChart>
@@ -132,7 +132,7 @@ export default function Compare() {
 
           {/* CO2 Comparison */}
           <div className="card">
-            <h2 className="text-xl font-semibold mb-4">CO₂ Emissions Comparison</h2>
+            <h2 className="text-xl font-semibold mb-4">CO₂ Level Comparison</h2>
             <ResponsiveContainer width="100%" height={400}>
               <LineChart
                 data={results[0].projections.map((_, i) => ({
@@ -140,7 +140,7 @@ export default function Compare() {
                   ...Object.fromEntries(
                     results.map((r, idx) => [
                       `scenario_${idx + 1}`,
-                      r.projections[i]?.co2_emissions,
+                      r.projections[i]?.co2_level,
                     ])
                   ),
                 }))}
@@ -150,14 +150,14 @@ export default function Compare() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                {results.map((r, idx) => (
+                {results.map((_r, idx) => (
                   <Line
                     key={idx}
                     type="monotone"
                     dataKey={`scenario_${idx + 1}`}
                     stroke={colors[idx % colors.length]}
                     strokeWidth={2}
-                    name={r.scenario.name || `Scenario ${idx + 1}`}
+                    name={`Scenario ${idx + 1}`}
                   />
                 ))}
               </LineChart>
@@ -172,17 +172,26 @@ export default function Compare() {
                 <tr className="border-b">
                   <th className="text-left py-2">Scenario</th>
                   <th className="text-right py-2">Temp Change</th>
-                  <th className="text-right py-2">CO₂ Reduction</th>
-                  <th className="text-right py-2">Renewable %</th>
+                  <th className="text-right py-2">CO₂ Change</th>
+                  <th className="text-right py-2">Forest Cover</th>
                 </tr>
               </thead>
               <tbody>
                 {results.map((r, idx) => (
                   <tr key={idx} className="border-b">
-                    <td className="py-2">{r.scenario.name || `Scenario ${idx + 1}`}</td>
-                    <td className="text-right py-2">+{r.metrics.temp_change}°C</td>
-                    <td className="text-right py-2">-{r.metrics.co2_reduction}%</td>
-                    <td className="text-right py-2">{r.metrics.renewable_pct}%</td>
+                    <td className="py-2">Scenario {idx + 1}</td>
+                    <td className="text-right py-2">
+                      {r.metrics.temperature_change > 0 ? '+' : ''}
+                      {r.metrics.temperature_change.toFixed(2)}°C
+                    </td>
+                    <td className="text-right py-2">
+                      {r.metrics.co2_change > 0 ? '+' : ''}
+                      {r.metrics.co2_change.toFixed(1)} ppm
+                    </td>
+                    <td className="text-right py-2">
+                      {r.metrics.forest_cover_change > 0 ? '+' : ''}
+                      {r.metrics.forest_cover_change.toFixed(1)}%
+                    </td>
                   </tr>
                 ))}
               </tbody>

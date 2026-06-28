@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ClockIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { api } from '../services/api';
-import type { SimulationRun } from '../types';
+import type { HistoryItem } from '../types';
 
 export default function History() {
-  const [runs, setRuns] = useState<SimulationRun[]>([]);
+  const [runs, setRuns] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -53,25 +53,13 @@ export default function History() {
           {runs.map((run) => (
             <div key={run.id} className="card flex items-center justify-between">
               <div>
-                <h3 className="font-semibold">{run.scenario_name}</h3>
+                <h3 className="font-semibold">Simulation Run</h3>
                 <p className="text-sm text-gray-500">
-                  {run.region} • {run.created_at}
+                  Run ID: {run.id.slice(0, 8)}... • {run.created_at}
                 </p>
-                <div className="flex gap-2 mt-2">
-                  {run.actions.slice(0, 3).map((action) => (
-                    <span
-                      key={action}
-                      className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs"
-                    >
-                      {action.replace(/_/g, ' ')}
-                    </span>
-                  ))}
-                  {run.actions.length > 3 && (
-                    <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
-                      +{run.actions.length - 3} more
-                    </span>
-                  )}
-                </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  Scenario: {run.scenario_id.slice(0, 8)}...
+                </p>
               </div>
               <div className="flex items-center gap-4">
                 <span
@@ -80,7 +68,9 @@ export default function History() {
                       ? 'bg-green-100 text-green-700'
                       : run.status === 'running'
                       ? 'bg-yellow-100 text-yellow-700'
-                      : 'bg-red-100 text-red-700'
+                      : run.status === 'failed'
+                      ? 'bg-red-100 text-red-700'
+                      : 'bg-gray-100 text-gray-700'
                   }`}
                 >
                   {run.status}

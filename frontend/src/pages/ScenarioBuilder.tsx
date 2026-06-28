@@ -62,12 +62,6 @@ export default function ScenarioBuilder() {
     }
   };
 
-  const getSliderColor = (value: number) => {
-    if (value >= 0.7) return 'bg-climate-green';
-    if (value >= 0.4) return 'bg-climate-yellow';
-    return 'bg-climate-red';
-  };
-
   return (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-8">Create Climate Scenario</h1>

@@ -2,7 +2,6 @@ import axios from 'axios';
 import type {
   ScenarioConfig,
   Scenario,
-  SimulationRun,
   SimulationResults,
   Recommendations,
   HistoryItem,

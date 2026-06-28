@@ -18,10 +18,14 @@ interface AppState {
 
 const initialScenario: Partial<ScenarioConfig> = {
   name: '',
-  region: 'Global',
-  actions: [],
-  startYear: 2024,
-  endYear: 2034,
+  city: '',
+  country: '',
+  targetYear: 2035,
+  renewableEnergySlider: 0.5,
+  publicTransitSlider: 0.5,
+  reforestationSlider: 0.5,
+  carbonTaxSlider: 0.5,
+  greenInnovationSlider: 0.5,
 };
 
 export const useStore = create<AppState>((set) => ({
