@@ -32,7 +32,7 @@ async def test_create_scenario(client: AsyncClient):
         "end_year": 2034,
     }
     response = await client.post("/api/scenarios/", json=scenario_data)
-    assert response.status_code == 200
+    assert response.status_code == 201
     data = response.json()
     assert data["name"] == "Test Scenario"
     assert "id" in data

@@ -54,16 +54,16 @@ class TestForecasters:
     def test_statistical_forecaster(self):
         """Test statistical forecaster."""
         import numpy as np
-        
+
         forecaster = StatisticalForecaster()
         X = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)
-        y = np.array([10, 12, 14, 16, 18])
-        
+        y = np.array([10.0, 12.0, 14.0, 16.0, 18.0])
+
         forecaster.fit(X, y)
         predictions = forecaster.predict(X)
-        
+
         assert len(predictions) == 5
-        assert all(isinstance(p, (int, float)) for p in predictions)
+        assert all(isinstance(float(p), (int, float)) for p in predictions)
     
     def test_ensemble_forecaster(self):
         """Test ensemble forecaster."""

@@ -1,10 +1,15 @@
-from typing import List, Optional
+"""
+Scenario Schemas - Request/response models for scenarios.
+"""
+
+from typing import List
 from uuid import UUID
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ScenarioCreate(BaseModel):
+    """Schema for creating a new scenario."""
     name: str = Field(..., min_length=3, max_length=100, description="Scenario name")
     region: str = Field(default="Global", description="Target region")
     actions: List[str] = Field(..., min_length=1, description="List of climate actions")
@@ -13,6 +18,9 @@ class ScenarioCreate(BaseModel):
 
 
 class ScenarioResponse(BaseModel):
+    """Schema for scenario response."""
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     name: str
     region: str
@@ -21,16 +29,13 @@ class ScenarioResponse(BaseModel):
     end_year: int
     created_at: datetime
 
-    class Config:
-        from_attributes = True
-
 
 class ScenarioList(BaseModel):
+    """Schema for scenario list item."""
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     name: str
     region: str
     actions: List[str]
     created_at: datetime
-
-    class Config:
-        from_attributes = True

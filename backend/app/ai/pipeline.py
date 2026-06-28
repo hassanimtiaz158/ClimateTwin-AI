@@ -99,7 +99,7 @@ class DataPreprocessor:
         data = data.drop_duplicates()
         
         # Handle missing values
-        data = data.fillna(method='ffill')
+        data = data.ffill()
         
         # Validate ranges
         if 'temperature' in data.columns:
