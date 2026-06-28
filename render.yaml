@@ -23,7 +23,7 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: CORS_ORIGINS
-        value: '["https://climatetwin.vercel.app"]'
+        value: "https://climatetwin.vercel.app"
       - key: DEBUG
         value: "false"
       - key: PYTHON_VERSION

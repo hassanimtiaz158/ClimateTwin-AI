@@ -18,11 +18,18 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 def _parse_cors(origins: str | list) -> list[str]:
     """Parse CORS_ORIGINS from JSON string, comma-separated string, or list."""
     if isinstance(origins, list):
-        return origins
+        return [str(o).strip() for o in origins if str(o).strip()]
     if isinstance(origins, str):
         s = origins.strip()
+        # Strip surrounding quotes that some env sources add
+        if (s.startswith('"') and s.endswith('"')) or (s.startswith("'") and s.endswith("'")):
+            s = s[1:-1].strip()
         if s.startswith("["):
-            return json.loads(s)
+            try:
+                parsed = json.loads(s)
+                return [str(o).strip() for o in parsed if str(o).strip()]
+            except json.JSONDecodeError:
+                pass
         return [o.strip() for o in s.split(",") if o.strip()]
     return []
 
