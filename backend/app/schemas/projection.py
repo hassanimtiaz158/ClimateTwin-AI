@@ -26,7 +26,7 @@ class ProjectionPoint(BaseModel):
 
 
 # ── Summary metrics ────────────────────────────────────────────
-class SimulationMetrics(BaseModel):
+class ProjectionMetrics(BaseModel):
     """Aggregated metrics across the full projection horizon."""
 
     model_config = ConfigDict(from_attributes=True)
@@ -44,7 +44,7 @@ class ProjectionResponse(BaseModel):
     run_id: UUID
     scenario: Dict[str, Any]
     projections: List[ProjectionPoint]
-    metrics: SimulationMetrics
+    metrics: ProjectionMetrics
 
 
 # ── Backward-compatible alias ──────────────────────────────────

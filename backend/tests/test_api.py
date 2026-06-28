@@ -1,5 +1,7 @@
 """API integration tests."""
 
+from datetime import datetime, timezone
+
 import pytest
 from httpx import AsyncClient
 
@@ -50,7 +52,7 @@ async def test_create_scenario(client: AsyncClient):
     assert data["region"] == "New York, USA"
     assert "reforestation" in data["actions"]
     assert "renewable_energy" in data["actions"]
-    assert data["start_year"] == 2024
+    assert data["start_year"] == datetime.now(timezone.utc).year
     assert data["end_year"] == 2035
 
 

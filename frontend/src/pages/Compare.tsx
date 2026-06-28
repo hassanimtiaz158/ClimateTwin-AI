@@ -839,30 +839,61 @@ export default function Compare() {
             Key Insights
           </h3>
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-xl p-5 shadow-sm">
-              <div className="text-3xl mb-3">🌡️</div>
-              <h4 className="font-bold text-gray-800 mb-2">Temperature Impact</h4>
-              <p className="text-sm text-gray-600">
-                Strong action can reduce temperature increase by up to{' '}
-                <span className="font-bold text-primary-600">0.15°C</span> compared to no action.
-              </p>
-            </div>
-            <div className="bg-white rounded-xl p-5 shadow-sm">
-              <div className="text-3xl mb-3">🌲</div>
-              <h4 className="font-bold text-gray-800 mb-2">Forest Recovery</h4>
-              <p className="text-sm text-gray-600">
-                Aggressive reforestation can increase forest cover by{' '}
-                <span className="font-bold text-primary-600">+5%</span> over the decade.
-              </p>
-            </div>
-            <div className="bg-white rounded-xl p-5 shadow-sm">
-              <div className="text-3xl mb-3">☁️</div>
-              <h4 className="font-bold text-gray-800 mb-2">CO₂ Reduction</h4>
-              <p className="text-sm text-gray-600">
-                Strong measures can reduce CO₂ levels by{' '}
-                <span className="font-bold text-primary-600">40+ ppm</span> compared to baseline.
-              </p>
-            </div>
+            {(() => {
+              const summaries = selectedScenarios.map(id => ({
+                id,
+                name: PRESET_SCENARIOS.find(s => s.id === id)?.name || id,
+                summary: getScenarioSummary(id),
+              })).filter(s => s.summary);
+              const bestScenario = summaries.reduce((best, s) =>
+                (getImpactScore(s.id) > getImpactScore(best?.id || '')) ? s : best,
+                summaries[0]
+              );
+              const worstScenario = summaries.reduce((worst, s) =>
+                (getImpactScore(s.id) < getImpactScore(worst?.id || '')) ? s : worst,
+                summaries[0]
+              );
+              const bestTemp = bestScenario?.summary?.tempChange ?? 0;
+              const worstTemp = worstScenario?.summary?.tempChange ?? 0;
+              const bestForest = bestScenario?.summary?.forestChange ?? 0;
+              return (
+                <>
+                  <div className="bg-white rounded-xl p-5 shadow-sm">
+                    <div className="text-3xl mb-3">🌡️</div>
+                    <h4 className="font-bold text-gray-800 mb-2">Temperature Impact</h4>
+                    <p className="text-sm text-gray-600">
+                      {bestScenario?.name || 'Strong action'} can reduce temperature increase by up to{' '}
+                      <span className="font-bold text-primary-600">
+                        {Math.abs(worstTemp - bestTemp).toFixed(2)}°C
+                      </span>{' '}
+                      compared to {worstScenario?.name || 'no action'}.
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-xl p-5 shadow-sm">
+                    <div className="text-3xl mb-3">🌲</div>
+                    <h4 className="font-bold text-gray-800 mb-2">Forest Recovery</h4>
+                    <p className="text-sm text-gray-600">
+                      {bestScenario?.name || 'Aggressive reforestation'} can increase forest cover by{' '}
+                      <span className="font-bold text-primary-600">
+                        {bestForest > 0 ? '+' : ''}{bestForest.toFixed(1)}%
+                      </span>{' '}
+                      over the projection period.
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-xl p-5 shadow-sm">
+                    <div className="text-3xl mb-3">☁️</div>
+                    <h4 className="font-bold text-gray-800 mb-2">CO₂ Reduction</h4>
+                    <p className="text-sm text-gray-600">
+                      {bestScenario?.name || 'Strong measures'} can reduce CO₂ levels by{' '}
+                      <span className="font-bold text-primary-600">
+                        {Math.abs(bestScenario?.summary?.co2Change ?? 0)} ppm
+                      </span>{' '}
+                      compared to baseline.
+                    </p>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
 

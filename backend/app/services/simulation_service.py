@@ -48,6 +48,35 @@ class SimulationService:
         logger.info("Simulation run created: %s", run.id)
         return run
 
+    async def create_inline_scenario(
+        self,
+        city: str,
+        country: str,
+        target_year: int,
+        reforestation_slider: float = 0.0,
+        renewable_energy_slider: float = 0.0,
+        ev_adoption_slider: float = 0.0,
+        emission_reduction_slider: float = 0.0,
+        public_transit_slider: float = 0.0,
+        water_conservation_slider: float = 0.0,
+    ) -> Scenario:
+        """Create an inline scenario from request parameters."""
+        scenario = Scenario(
+            name="Inline Simulation",
+            city=city,
+            country=country,
+            target_year=target_year,
+            reforestation_slider=reforestation_slider,
+            renewable_energy_slider=renewable_energy_slider,
+            ev_adoption_slider=ev_adoption_slider,
+            emission_reduction_slider=emission_reduction_slider,
+            public_transit_slider=public_transit_slider,
+            water_conservation_slider=water_conservation_slider,
+        )
+        self.db.add(scenario)
+        await self.db.flush()
+        return scenario
+
     async def execute_with_projections(self, run_id: UUID) -> List[Dict[str, Any]]:
         """Execute the simulation and return projections."""
         logger.info("Executing simulation: %s", run_id)
@@ -55,7 +84,9 @@ class SimulationService:
         result = await self.db.execute(
             select(SimulationRun).where(SimulationRun.id == run_id)
         )
-        run = result.scalar_one()
+        run = result.scalar_one_or_none()
+        if not run:
+            raise ValueError(f"Simulation run {run_id} not found")
 
         run.status = "running"
         run.started_at = datetime.now(timezone.utc)
@@ -66,7 +97,7 @@ class SimulationService:
             if not scenario:
                 raise ValueError(f"Scenario {run.scenario_id} not found")
 
-            projections = await asyncio.get_event_loop().run_in_executor(
+            projections = await asyncio.get_running_loop().run_in_executor(
                 None,
                 self.projection_engine.run,
                 scenario.actions,

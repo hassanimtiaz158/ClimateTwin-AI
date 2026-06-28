@@ -1,6 +1,16 @@
 import type { SimulationResults } from '../types';
+import { calculateImpactScore } from '../utils';
 
 // ── Helpers ──────────────────────────────────────────────────
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -67,18 +77,7 @@ function priorityColor(p: string) {
 export function exportHTML(results: SimulationResults) {
   const m = results.metrics;
 
-  const summaryScore = (() => {
-    let score = 50;
-    if (m.temperature_change < 0) score += 15;
-    else if (m.temperature_change > 1) score -= 15;
-    if (m.co2_change < 0) score += 10;
-    else if (m.co2_change > 50) score -= 10;
-    if (m.forest_cover_change > 0) score += 10;
-    else if (m.forest_cover_change < -5) score -= 10;
-    if (m.biodiversity_change > 0) score += 5;
-    if (m.water_stress_change < 0) score += 5;
-    return Math.max(0, Math.min(100, score));
-  })();
+  const summaryScore = calculateImpactScore(m);
 
   const scoreColor = summaryScore >= 70 ? '#16a34a' : summaryScore >= 50 ? '#d97706' : '#dc2626';
   const scoreLabel = summaryScore >= 70 ? 'Positive Impact' : summaryScore >= 50 ? 'Moderate Impact' : 'Low Impact';
@@ -105,8 +104,8 @@ export function exportHTML(results: SimulationResults) {
         <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:${priorityColor(r.priority)}">${r.priority} priority</span>
         <span style="font-size:11px;color:#6b7280">${Math.round(r.confidence * 100)}% confidence</span>
       </div>
-      <div style="font-weight:700;margin-bottom:4px">${r.title}</div>
-      <div style="font-size:14px;color:#4b5563">${r.description}</div>
+      <div style="font-weight:700;margin-bottom:4px">${escapeHtml(r.title)}</div>
+      <div style="font-size:14px;color:#4b5563">${escapeHtml(r.description)}</div>
     </div>`).join('');
 
   const html = `<!DOCTYPE html>
@@ -129,7 +128,7 @@ export function exportHTML(results: SimulationResults) {
       <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#16a34a;margin-bottom:8px">ClimateTwin AI</div>
       <h1 style="font-size:28px;font-weight:800;margin-bottom:4px">Climate Impact Report</h1>
       <div style="color:#6b7280;font-size:14px">Generated ${formatDate()}</div>
-      <div style="color:#94a3b8;font-size:12px;margin-top:4px">Run ID: ${results.run_id.slice(0, 12)}...</div>
+      <div style="color:#94a3b8;font-size:12px;margin-top:4px">Run ID: ${escapeHtml(results.run_id.slice(0, 12))}...</div>
     </div>
 
     <!-- Impact Score -->

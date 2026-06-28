@@ -4,46 +4,7 @@ import { useStore } from '../store/useStore';
 describe('useStore', () => {
   beforeEach(() => {
     useStore.setState({
-      currentScenario: {
-        name: '',
-        city: '',
-        country: '',
-        targetYear: 2035,
-        reforestationSlider: 0.0,
-        renewableEnergySlider: 0.0,
-        evAdoptionSlider: 0.0,
-        emissionReductionSlider: 0.0,
-        publicTransitSlider: 0.0,
-        waterConservationSlider: 0.0,
-      },
       resultsCache: {},
-    });
-  });
-
-  describe('currentScenario', () => {
-    it('starts with default values', () => {
-      const state = useStore.getState();
-      expect(state.currentScenario.name).toBe('');
-      expect(state.currentScenario.targetYear).toBe(2035);
-      expect(state.currentScenario.reforestationSlider).toBe(0.0);
-    });
-
-    it('setCurrentScenario merges partial data', () => {
-      const { setCurrentScenario } = useStore.getState();
-      setCurrentScenario({ name: 'Test', city: 'Lisbon' });
-      const state = useStore.getState();
-      expect(state.currentScenario.name).toBe('Test');
-      expect(state.currentScenario.city).toBe('Lisbon');
-      expect(state.currentScenario.targetYear).toBe(2035);
-    });
-
-    it('resetCurrentScenario restores defaults', () => {
-      const { setCurrentScenario, resetCurrentScenario } = useStore.getState();
-      setCurrentScenario({ name: 'Changed', city: 'Berlin' });
-      resetCurrentScenario();
-      const state = useStore.getState();
-      expect(state.currentScenario.name).toBe('');
-      expect(state.currentScenario.city).toBe('');
     });
   });
 

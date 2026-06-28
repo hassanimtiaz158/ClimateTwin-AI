@@ -1,7 +1,7 @@
 """Model tests."""
 
 import pytest
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.models import Scenario, SimulationRun, ProjectionResult, Dataset
 
@@ -37,7 +37,7 @@ def test_scenario_creation():
     assert "public_transit" in scenario.actions
     assert "water_conservation" in scenario.actions
     assert "emission_reduction" not in scenario.actions  # 0.0 < 0.1 threshold
-    assert scenario.start_year == 2024
+    assert scenario.start_year == datetime.now(timezone.utc).year
     assert scenario.end_year == 2035
 
 

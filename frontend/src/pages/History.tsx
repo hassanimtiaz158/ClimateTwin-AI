@@ -161,7 +161,9 @@ export default function History() {
                   }`} />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-800">Simulation Run</h3>
+                  <h3 className="font-semibold text-gray-800">
+                    {run.scenario_id ? `Scenario ${run.scenario_id.slice(0, 8)}` : 'Climate Simulation'}
+                  </h3>
                   <p className="text-sm text-gray-500">
                     {formatDate(run.created_at)}
                   </p>
@@ -182,7 +184,7 @@ export default function History() {
                       : 'bg-gray-100 text-gray-600'
                   }`}
                 >
-                  {run.status}
+                  {run.status.charAt(0).toUpperCase() + run.status.slice(1)}
                 </span>
                 {run.status === 'completed' && (
                   <Link

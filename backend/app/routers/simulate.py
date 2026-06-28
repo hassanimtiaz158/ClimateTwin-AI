@@ -52,21 +52,18 @@ async def run_simulation(
         if not scenario:
             raise HTTPException(status_code=404, detail="Scenario not found")
     else:
-        # Create inline scenario
-        scenario = Scenario(
-            name="Inline Simulation",
+        # Create inline scenario via service (avoids bypassing service layer)
+        scenario = await service.create_inline_scenario(
             city=request.city or "Global",
             country=request.country or "Global",
-            target_year=request.target_year or 2035,
-            reforestation_slider=request.reforestation_slider or 0.0,
-            renewable_energy_slider=request.renewable_energy_slider or 0.0,
-            ev_adoption_slider=request.ev_adoption_slider or 0.0,
-            emission_reduction_slider=request.emission_reduction_slider or 0.0,
-            public_transit_slider=request.public_transit_slider or 0.0,
-            water_conservation_slider=request.water_conservation_slider or 0.0,
+            target_year=request.target_year if request.target_year is not None else 2035,
+            reforestation_slider=request.reforestation_slider if request.reforestation_slider is not None else 0.0,
+            renewable_energy_slider=request.renewable_energy_slider if request.renewable_energy_slider is not None else 0.0,
+            ev_adoption_slider=request.ev_adoption_slider if request.ev_adoption_slider is not None else 0.0,
+            emission_reduction_slider=request.emission_reduction_slider if request.emission_reduction_slider is not None else 0.0,
+            public_transit_slider=request.public_transit_slider if request.public_transit_slider is not None else 0.0,
+            water_conservation_slider=request.water_conservation_slider if request.water_conservation_slider is not None else 0.0,
         )
-        db.add(scenario)
-        await db.flush()
 
     # Create simulation run
     run = await service.create_run(scenario.id)
@@ -76,6 +73,10 @@ async def run_simulation(
         projections = await service.execute_with_projections(run.id)
     except Exception as e:
         logger.exception("Simulation failed for run %s", run.id)
+        # Rollback the inline scenario and run on failure
+        if not request.scenario_id:
+            await db.delete(scenario)
+            await db.flush()
         raise HTTPException(
             status_code=500,
             detail="Simulation failed. Please try again.",

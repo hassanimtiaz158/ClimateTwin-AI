@@ -495,7 +495,7 @@ export default function Landing() {
                   <ArrowRightIcon className="h-5 w-5" />
                 </Link>
                 <a
-                  href="https://github.com"
+                  href="https://github.com/hassanimtiaz158/ClimateTwin-AI"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-cta-outline inline-flex items-center gap-2"

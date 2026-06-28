@@ -97,8 +97,8 @@ class Scenario(Base):
 
     @property
     def start_year(self) -> int:
-        """Always start from current year (2024)."""
-        return 2024
+        """Always start from the current calendar year."""
+        return datetime.now(timezone.utc).year
 
     @property
     def end_year(self) -> int:

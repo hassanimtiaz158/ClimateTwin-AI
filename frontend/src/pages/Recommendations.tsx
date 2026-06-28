@@ -66,7 +66,7 @@ export default function Recommendations() {
   }
 
   // ── Error State ────────────────────────────────────────────
-  if (error || !recommendations) {
+  if (error || !recommendations || !recommendations.actions || !recommendations.findings) {
     return (
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
@@ -132,7 +132,7 @@ export default function Recommendations() {
           </div>
           <div>
             <h2 className="text-xl font-semibold mb-2 text-gray-800">Executive Summary</h2>
-            <p className="text-gray-700 leading-relaxed">{recommendations.summary}</p>
+            <p className="text-gray-700 leading-relaxed">{recommendations.summary || 'No summary available.'}</p>
           </div>
         </div>
       </div>

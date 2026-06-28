@@ -33,6 +33,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { api, ApiError } from '../services/api';
 import { exportJSON, exportHTML } from '../services/exportReport';
+import { calculateImpactScore } from '../utils';
 import { useStore } from '../store/useStore';
 import type { SimulationResults } from '../types';
 
@@ -261,20 +262,7 @@ export default function Dashboard() {
   const projections = results.projections;
 
   // ── Calculate overall score ─────────────────────────────────
-  const getImpactScore = () => {
-    let score = 50;
-    if (metrics.temperature_change < 0) score += 15;
-    else if (metrics.temperature_change > 1) score -= 15;
-    if (metrics.co2_change < 0) score += 10;
-    else if (metrics.co2_change > 50) score -= 10;
-    if (metrics.forest_cover_change > 0) score += 10;
-    else if (metrics.forest_cover_change < -5) score -= 10;
-    if (metrics.biodiversity_change > 0) score += 5;
-    if (metrics.water_stress_change < 0) score += 5;
-    return Math.max(0, Math.min(100, score));
-  };
-
-  const impactScore = getImpactScore();
+  const impactScore = calculateImpactScore(metrics);
   const getScoreColor = () => {
     if (impactScore >= 70) return 'text-green-600';
     if (impactScore >= 50) return 'text-amber-600';
@@ -306,7 +294,7 @@ export default function Dashboard() {
                 <h1 className="text-3xl font-bold text-gray-900">Climate Dashboard</h1>
               </div>
               <p className="text-gray-500 ml-11">
-                Simulation results for your climate scenario
+                Scenario {results.scenario_id.slice(0, 8)} · Run {results.run_id.slice(0, 8)}
               </p>
             </div>
             <div className="flex items-center gap-3 ml-11 sm:ml-0">

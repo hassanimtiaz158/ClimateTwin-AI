@@ -36,7 +36,6 @@ class DatasetRead(BaseModel):
     source: Optional[str] = None
     region: str
     date_range: Optional[Dict[str, Any]] = None
-    file_path: Optional[str] = None
     record_count: int
     created_at: datetime
     updated_at: datetime
