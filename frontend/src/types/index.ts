@@ -1,56 +1,102 @@
 export interface ScenarioConfig {
   name: string;
-  region: string;
-  actions: string[];
-  startYear: number;
-  endYear: number;
+  city: string;
+  country: string;
+  targetYear: number;
+  renewableEnergySlider: number;
+  publicTransitSlider: number;
+  reforestationSlider: number;
+  carbonTaxSlider: number;
+  greenInnovationSlider: number;
+  notes?: string;
 }
 
 export interface Scenario {
   id: string;
+  user_id?: string;
   name: string;
+  city: string;
+  country: string;
+  target_year: number;
+  renewable_energy_slider: number;
+  public_transit_slider: number;
+  reforestation_slider: number;
+  carbon_tax_slider: number;
+  green_innovation_slider: number;
+  notes?: string;
+  // Derived fields (backward compatibility)
   region: string;
   actions: string[];
-  startYear: number;
-  endYear: number;
+  start_year: number;
+  end_year: number;
   created_at: string;
+  updated_at: string;
 }
 
 export interface SimulationRun {
   id: string;
   scenario_id: string;
-  scenario_name: string;
-  region: string;
-  actions: string[];
   status: 'pending' | 'running' | 'completed' | 'failed';
-  created_at: string;
+  error_message?: string;
+  started_at?: string;
   completed_at?: string;
+  created_at: string;
 }
 
 export interface ProjectionDataPoint {
   year: number;
-  temperature: number;
-  co2_emissions: number;
-  baseline: number;
+  temperature_change: number;
+  co2_level: number;
+  air_quality_index: number;
+  forest_cover: number;
+  biodiversity_score: number;
+  water_stress: number;
+  heatwave_frequency: number;
+  flood_risk: number;
+  // Baseline comparisons
+  baseline_temperature: number;
   baseline_co2: number;
+  // Confidence bounds
+  temperature_change_low?: number;
+  temperature_change_high?: number;
 }
 
 export interface SimulationMetrics {
-  temp_change: number;
-  co2_reduction: number;
-  renewable_pct: number;
-  aqi: number;
+  temperature_change: number;
+  co2_change: number;
+  air_quality_change: number;
+  forest_cover_change: number;
+  biodiversity_change: number;
+  water_stress_change: number;
+  heatwave_change: number;
+  flood_risk_change: number;
+}
+
+export interface ChartDataPoint {
+  year: number;
+  value: number;
+  baseline?: number;
+  label?: string;
 }
 
 export interface SimulationResults {
   run_id: string;
-  scenario: {
-    name: string;
-    region: string;
-    actions: string[];
-  };
+  scenario_id: string;
+  status: string;
+  message: string;
   projections: ProjectionDataPoint[];
   metrics: SimulationMetrics;
+  chart_data: Record<string, ChartDataPoint[]>;
+  recommendations: RecommendationItem[];
+}
+
+export interface RecommendationItem {
+  category: string;
+  priority: 'high' | 'medium' | 'low';
+  title: string;
+  description: string;
+  action?: string;
+  confidence: number;
 }
 
 export interface RecommendationAction {
@@ -61,6 +107,7 @@ export interface RecommendationAction {
 }
 
 export interface Recommendations {
+  run_id: string;
   summary: string;
   findings: string[];
   actions: RecommendationAction[];
@@ -69,9 +116,18 @@ export interface Recommendations {
 
 export interface HistoryItem {
   id: string;
-  scenario_name: string;
-  region: string;
-  actions: string[];
+  scenario_id: string;
   status: string;
+  started_at?: string;
+  completed_at?: string;
+  created_at: string;
+}
+
+export interface ClimateDataset {
+  id: string;
+  name: string;
+  source?: string;
+  region: string;
+  record_count: number;
   created_at: string;
 }

@@ -1,201 +1,217 @@
-"""Climate Projection Pipeline.
+"""Climate Projection Pipeline v1.
 
 This module orchestrates the AI/ML pipeline for climate projections.
-It handles data loading, preprocessing, model execution, and result generation.
+It handles data loading, preprocessing, model execution, and result generation
+for 8 climate indicators.
 """
 
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 import pandas as pd
 import numpy as np
+
+from app.services.climate_data_loader import get_data_loader, ClimateDataRecord
+
+
+# ── 8 Climate Indicators ──────────────────────────────────────
+INDICATORS = [
+    "temperature_change",
+    "co2_level",
+    "air_quality_index",
+    "forest_cover",
+    "biodiversity_score",
+    "water_stress",
+    "heatwave_frequency",
+    "flood_risk",
+]
+
+# ── Action Impact Table ───────────────────────────────────────
+ACTION_IMPACT_TABLE = {
+    "renewable_energy": {
+        "co2_level": -0.15,
+        "air_quality_index": -0.08,
+        "temperature_change": -0.02,
+    },
+    "public_transit": {
+        "co2_level": -0.10,
+        "air_quality_index": -0.05,
+        "temperature_change": -0.01,
+    },
+    "reforestation": {
+        "forest_cover": 0.12,
+        "biodiversity_score": 0.08,
+        "co2_level": -0.05,
+        "flood_risk": -0.03,
+    },
+    "carbon_tax": {
+        "co2_level": -0.20,
+        "temperature_change": -0.025,
+    },
+    "waste_reduction": {
+        "air_quality_index": -0.03,
+        "water_stress": -0.02,
+    },
+    "green_buildings": {
+        "co2_level": -0.08,
+        "temperature_change": -0.01,
+        "heatwave_frequency": -0.05,
+    },
+}
 
 
 class ClimatePipeline:
     """Main pipeline for climate projection processing."""
-    
+
     def __init__(self):
-        self.data_loader = DataLoader()
-        self.preprocessor = DataPreprocessor()
-        self.forecaster = ClimateForecaster()
-        self.explainer = ProjectionExplainer()
-    
+        self.data_loader = get_data_loader()
+
     def run(
         self,
         actions: List[str],
         start_year: int,
         end_year: int,
         region: str,
-        dataset_path: str = None,
+        dataset_path: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
-        """Execute the full pipeline."""
+        """Execute the full pipeline for 8 indicators."""
         # Step 1: Load historical data
-        if dataset_path:
-            historical_data = self.data_loader.load(dataset_path)
-        else:
-            historical_data = self.data_loader.generate_sample(region, start_year - 20)
-        
-        # Step 2: Clean and normalize
-        cleaned_data = self.preprocessor.clean(historical_data)
-        
-        # Step 3: Generate scenario variables
-        scenario_vars = self.preprocessor.generate_scenario_variables(
-            actions=actions,
-            start_year=start_year,
-            end_year=end_year,
-        )
-        
-        # Step 4: Run forecasting model
-        projections = self.forecaster.predict(
-            historical_data=cleaned_data,
-            scenario_vars=scenario_vars,
-            start_year=start_year,
-            end_year=end_year,
-        )
-        
-        # Step 5: Generate explanations
-        explanations = self.explainer.explain(projections, actions)
-        
-        return projections
+        historical_records = self._load_historical_data(region, dataset_path)
 
+        # Step 2: Get baseline
+        baseline = self._get_baseline(historical_records, start_year)
 
-class DataLoader:
-    """Handles loading climate datasets."""
-    
-    def load(self, file_path: str) -> pd.DataFrame:
-        """Load data from file."""
-        if file_path.endswith('.csv'):
-            return pd.read_csv(file_path)
-        elif file_path.endswith('.parquet'):
-            return pd.read_parquet(file_path)
-        elif file_path.endswith('.json'):
-            return pd.read_json(file_path)
-        raise ValueError(f"Unsupported file format: {file_path}")
-    
-    def generate_sample(self, region: str, years: int) -> pd.DataFrame:
-        """Generate sample historical data for demonstration."""
-        np.random.seed(42)
-        data = []
-        base_temp = 14.5  # Global average temperature
-        
-        for i in range(years):
-            year = 2004 + i
-            temp = base_temp + (i * 0.02) + np.random.normal(0, 0.1)
-            co2 = 380 + (i * 2.5) + np.random.normal(0, 5)
-            data.append({
-                'year': year,
-                'temperature': temp,
-                'co2_emissions': co2,
-                'renewable_energy': 10 + (i * 1.5),
-            })
-        
-        return pd.DataFrame(data)
+        # Step 3: Calculate action impacts
+        action_effects = self._calculate_action_effects(actions)
 
-
-class DataPreprocessor:
-    """Handles data cleaning and preprocessing."""
-    
-    def clean(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Clean and validate data."""
-        # Remove duplicates
-        data = data.drop_duplicates()
-        
-        # Handle missing values
-        data = data.ffill()
-        
-        # Validate ranges
-        if 'temperature' in data.columns:
-            data = data[(data['temperature'] > -50) & (data['temperature'] < 60)]
-        
-        return data
-    
-    def generate_scenario_variables(
-        self,
-        actions: List[str],
-        start_year: int,
-        end_year: int,
-    ) -> pd.DataFrame:
-        """Generate scenario-based variable adjustments."""
-        years = list(range(start_year, end_year + 1))
-        
-        # Action impacts (simplified for MVP)
-        action_impacts = {
-            'renewable_energy': {'co2_reduction': 0.15, 'temp_benefit': -0.02},
-            'public_transit': {'co2_reduction': 0.08, 'temp_benefit': -0.01},
-            'reforestation': {'co2_reduction': 0.05, 'temp_benefit': -0.015},
-            'carbon_tax': {'co2_reduction': 0.12, 'temp_benefit': -0.025},
-            'waste_reduction': {'co2_reduction': 0.04, 'temp_benefit': -0.005},
-            'green_buildings': {'co2_reduction': 0.06, 'temp_benefit': -0.008},
-        }
-        
-        # Calculate cumulative impact
-        total_co2_impact = sum(
-            action_impacts.get(a, {}).get('co2_reduction', 0) for a in actions
-        )
-        total_temp_impact = sum(
-            action_impacts.get(a, {}).get('temp_benefit', 0) for a in actions
-        )
-        
-        # Generate variables
-        data = []
-        for i, year in enumerate(years):
-            progress = i / (len(years) - 1) if len(years) > 1 else 0
-            data.append({
-                'year': year,
-                'co2_factor': 1 - (total_co2_impact * progress),
-                'temp_factor': total_temp_impact * progress,
-                'renewable_boost': len(actions) * 2 * progress,
-            })
-        
-        return pd.DataFrame(data)
-
-
-class ClimateForecaster:
-    """Performs climate projections using ML models."""
-    
-    def predict(
-        self,
-        historical_data: pd.DataFrame,
-        scenario_vars: pd.DataFrame,
-        start_year: int,
-        end_year: int,
-    ) -> List[Dict[str, Any]]:
-        """Generate projections based on scenario."""
+        # Step 4: Generate projections for each year
         projections = []
-        
-        # Get baseline trends
-        last_temp = historical_data['temperature'].iloc[-1] if len(historical_data) > 0 else 14.5
-        last_co2 = historical_data['co2_emissions'].iloc[-1] if len(historical_data) > 0 else 420
-        
-        for _, row in scenario_vars.iterrows():
-            year = int(row['year'])
+        for year in range(start_year, end_year + 1):
             year_offset = year - start_year
-            
-            # Baseline projection (no action)
-            baseline_temp = last_temp + (year_offset * 0.03)
-            baseline_co2 = last_co2 + (year_offset * 3)
-            
-            # Scenario projection
-            projected_temp = baseline_temp + row['temp_factor']
-            projected_co2 = baseline_co2 * row['co2_factor']
-            
-            # Add uncertainty bounds
-            uncertainty = 0.1 * year_offset
-            
-            projections.append({
-                'year': year,
-                'temperature': round(projected_temp, 2),
-                'co2_emissions': round(projected_co2, 1),
-                'baseline': round(baseline_temp, 2),
-                'baseline_co2': round(baseline_co2, 1),
-                'temp_low': round(projected_temp - uncertainty, 2),
-                'temp_high': round(projected_temp + uncertainty, 2),
-            })
-        
+            projection = self._project_year(
+                baseline=baseline,
+                action_effects=action_effects,
+                year=year,
+                year_offset=year_offset,
+            )
+            projections.append(projection)
+
         return projections
+
+    def _load_historical_data(
+        self, region: str, dataset_path: Optional[str]
+    ) -> List[ClimateDataRecord]:
+        """Load historical climate data."""
+        if dataset_path:
+            # Load from custom file
+            filename = dataset_path.split("/")[-1].split("\\")[-1]
+            dataset = self.data_loader.load_csv(filename, region)
+            return dataset.records
+
+        # Try to load region-specific data
+        region_file = f"{region.lower().replace(' ', '_')}_climate_data.csv"
+        try:
+            dataset = self.data_loader.load_csv(region_file, region)
+            return dataset.records
+        except FileNotFoundError:
+            # Fallback to global data
+            dataset = self.data_loader.load_csv("global_climate_data.csv", "Global")
+            return dataset.records
+
+    def _get_baseline(
+        self, records: List[ClimateDataRecord], start_year: int
+    ) -> Dict[str, float]:
+        """Get baseline values for projection start."""
+        # Find closest record to start_year
+        baseline_record = min(records, key=lambda r: abs(r.year - start_year))
+
+        return {
+            "temperature": baseline_record.temperature,
+            "co2_level": baseline_record.co2_level,
+            "air_quality_index": baseline_record.air_quality_index,
+            "forest_cover": baseline_record.forest_cover,
+            "biodiversity_score": baseline_record.biodiversity_score,
+            "water_stress": 0.5,  # Default if not in data
+            "heatwave_frequency": baseline_record.heatwave_frequency,
+            "flood_risk": baseline_record.flood_risk,
+        }
+
+    def _calculate_action_effects(self, actions: List[str]) -> Dict[str, float]:
+        """Calculate cumulative effects of selected actions."""
+        effects = {indicator: 0.0 for indicator in INDICATORS}
+
+        for action in actions:
+            if action in ACTION_IMPACT_TABLE:
+                for indicator, impact in ACTION_IMPACT_TABLE[action].items():
+                    effects[indicator] += impact
+
+        return effects
+
+    def _project_year(
+        self,
+        baseline: Dict[str, float],
+        action_effects: Dict[str, float],
+        year: int,
+        year_offset: int,
+    ) -> Dict[str, Any]:
+        """Project all 8 indicators for a single year."""
+        # Natural trend rates (per year without action)
+        natural_trends = {
+            "temperature_change": 0.03,       # +0.03C/year
+            "co2_level": 2.5,                  # +2.5 ppm/year
+            "air_quality_index": 0.5,          # +0.5 AQI/year (worsening)
+            "forest_cover": -0.3,              # -0.3%/year (deforestation)
+            "biodiversity_score": -0.005,      # -0.005/year
+            "water_stress": 0.01,              # +0.01/year
+            "heatwave_frequency": 0.5,         # +0.5 days/year
+            "flood_risk": 0.005,               # +0.005/year
+        }
+
+        projection = {"year": year}
+        uncertainty = 0.05 * year_offset  # Uncertainty grows with time
+
+        for indicator in INDICATORS:
+            baseline_val = baseline.get(indicator, 0)
+            natural_rate = natural_trends.get(indicator, 0)
+            action_effect = action_effects.get(indicator, 0)
+
+            # Project value: baseline + natural trend * years + action effect * years
+            projected = baseline_val + (natural_rate * year_offset) + (action_effect * year_offset * abs(baseline_val))
+
+            # Add some noise for realism
+            noise = np.random.normal(0, abs(projected) * 0.01) if projected != 0 else 0
+            projected += noise
+
+            # Clamp to valid ranges
+            if indicator == "temperature_change":
+                projected = max(-10, min(10, projected))
+            elif indicator in ["co2_level"]:
+                projected = max(150, min(1000, projected))
+            elif indicator in ["air_quality_index"]:
+                projected = max(0, min(500, projected))
+            elif indicator in ["forest_cover"]:
+                projected = max(0, min(100, projected))
+            elif indicator in ["biodiversity_score", "water_stress", "flood_risk"]:
+                projected = max(0, min(1, projected))
+            elif indicator in ["heatwave_frequency"]:
+                projected = max(0, min(365, int(projected)))
+
+            projection[indicator] = round(projected, 3)
+            projection[f"{indicator}_low"] = round(projected - uncertainty, 3)
+            projection[f"{indicator}_high"] = round(projected + uncertainty, 3)
+
+        # Calculate baseline projection (no action) for comparison
+        projection["baseline_temperature"] = round(
+            baseline["temperature"] + (natural_trends["temperature_change"] * year_offset), 2
+        )
+        projection["baseline_co2"] = round(
+            baseline["co2_level"] + (natural_trends["co2_level"] * year_offset), 1
+        )
+
+        return projection
 
 
 class ProjectionExplainer:
     """Generates explanations for projections."""
-    
+
     def explain(
         self,
         projections: List[Dict[str, Any]],
@@ -203,17 +219,17 @@ class ProjectionExplainer:
     ) -> Dict[str, Any]:
         """Generate human-readable explanations."""
         if not projections:
-            return {'summary': 'No projections available'}
-        
+            return {"summary": "No projections available"}
+
         first = projections[0]
         last = projections[-1]
-        
-        temp_change = last['temperature'] - first['temperature']
-        co2_change = ((last['co2_emissions'] - first['co2_emissions']) / first['co2_emissions']) * 100
-        
+
+        temp_change = last["temperature_change"] - first["temperature_change"]
+        co2_change = last["co2_level"] - first["co2_level"]
+
         return {
-            'temp_change': round(temp_change, 2),
-            'co2_change_percent': round(co2_change, 1),
-            'actions_applied': len(actions),
-            'projection_years': len(projections),
+            "temp_change": round(temp_change, 2),
+            "co2_change": round(co2_change, 1),
+            "actions_applied": len(actions),
+            "projection_years": len(projections),
         }

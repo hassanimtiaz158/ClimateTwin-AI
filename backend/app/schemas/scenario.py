@@ -10,10 +10,10 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
-# ── Valid climate actions ──────────────────────────────────────
+# ── Valid climate actions (for backward compatibility) ────────
 VALID_ACTIONS = frozenset({
     "renewable_energy",
     "public_transit",
@@ -23,26 +23,24 @@ VALID_ACTIONS = frozenset({
     "green_buildings",
 })
 
-VALID_REGIONS = frozenset({
-    "Global",
-    "North America",
-    "Europe",
-    "Asia Pacific",
-    "Africa",
-    "South America",
-    "Middle East",
-})
-
 
 # ── Create ─────────────────────────────────────────────────────
 class ScenarioCreate(BaseModel):
     """Payload for creating a new climate scenario."""
 
     name: str = Field(..., min_length=3, max_length=100, description="Scenario name")
-    region: str = Field(default="Global", description="Target region")
-    actions: List[str] = Field(..., min_length=1, description="Climate actions to simulate")
-    start_year: int = Field(default=2024, ge=2024, le=2030, description="Projection start year")
-    end_year: int = Field(default=2034, ge=2025, le=2035, description="Projection end year")
+    city: str = Field(default="Global", max_length=100, description="Target city")
+    country: str = Field(default="Global", max_length=100, description="Target country")
+    target_year: int = Field(default=2035, ge=2025, le=2050, description="Projection target year")
+
+    # ── Sustainability policy sliders (0.0 - 1.0) ────────────
+    renewable_energy_slider: float = Field(default=0.0, ge=0.0, le=1.0, description="Renewable energy adoption level")
+    public_transit_slider: float = Field(default=0.0, ge=0.0, le=1.0, description="Public transit investment level")
+    reforestation_slider: float = Field(default=0.0, ge=0.0, le=1.0, description="Reforestation effort level")
+    carbon_tax_slider: float = Field(default=0.0, ge=0.0, le=1.0, description="Carbon tax strength level")
+    green_innovation_slider: float = Field(default=0.0, ge=0.0, le=1.0, description="Green innovation investment level")
+
+    notes: Optional[str] = Field(None, max_length=2000, description="Optional notes")
 
 
 # ── Read ───────────────────────────────────────────────────────
@@ -54,10 +52,24 @@ class ScenarioRead(BaseModel):
     id: UUID
     user_id: Optional[UUID] = None
     name: str
+    city: str
+    country: str
+    target_year: int
+
+    # ── Sustainability policy sliders ─────────────────────────
+    renewable_energy_slider: float
+    public_transit_slider: float
+    reforestation_slider: float
+    carbon_tax_slider: float
+    green_innovation_slider: float
+
+    # ── Derived fields (backward compatibility) ───────────────
     region: str
     actions: List[str]
     start_year: int
     end_year: int
+
+    notes: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
@@ -69,10 +81,16 @@ class ScenarioSummary(BaseModel):
 
     id: UUID
     name: str
+    city: str
+    country: str
+    target_year: int
+    renewable_energy_slider: float
+    public_transit_slider: float
+    reforestation_slider: float
+    carbon_tax_slider: float
+    green_innovation_slider: float
     region: str
     actions: List[str]
-    start_year: int
-    end_year: int
     created_at: datetime
 
 
@@ -81,13 +99,20 @@ class ScenarioUpdate(BaseModel):
     """Partial update for a scenario (only fields that can change)."""
 
     name: Optional[str] = Field(None, min_length=3, max_length=100)
-    region: Optional[str] = None
-    actions: Optional[List[str]] = Field(None, min_length=1)
-    start_year: Optional[int] = Field(None, ge=2024, le=2030)
-    end_year: Optional[int] = Field(None, ge=2025, le=2035)
+    city: Optional[str] = Field(None, max_length=100)
+    country: Optional[str] = Field(None, max_length=100)
+    target_year: Optional[int] = Field(None, ge=2025, le=2050)
+
+    # ── Sustainability policy sliders ─────────────────────────
+    renewable_energy_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
+    public_transit_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
+    reforestation_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
+    carbon_tax_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
+    green_innovation_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
+
+    notes: Optional[str] = Field(None, max_length=2000)
 
 
 # ── Backward-compatible aliases ────────────────────────────────
-# Existing routers import ScenarioResponse / ScenarioList — map them here.
 ScenarioResponse = ScenarioRead
 ScenarioList = ScenarioSummary

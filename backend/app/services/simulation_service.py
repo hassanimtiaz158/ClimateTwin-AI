@@ -3,7 +3,7 @@ Simulation Service - Orchestrates simulation execution.
 """
 
 import logging
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 from datetime import datetime
 
@@ -47,8 +47,8 @@ class SimulationService:
         logger.info(f"Simulation run created: {run.id}")
         return run
 
-    async def execute(self, run_id: UUID) -> None:
-        """Execute the simulation and store results."""
+    async def execute_with_projections(self, run_id: UUID) -> List[Dict[str, Any]]:
+        """Execute the simulation and return projections."""
         logger.info(f"Executing simulation: {run_id}")
 
         # Fetch run record
@@ -82,10 +82,10 @@ class SimulationService:
                     simulation_run_id=run_id,
                     year=proj["year"],
                     indicator="composite",
-                    value=proj["temperature"],
-                    confidence_low=proj.get("temp_low"),
-                    confidence_high=proj.get("temp_high"),
-                    baseline_value=proj["baseline"],
+                    value=proj["temperature_change"],
+                    confidence_low=proj.get("temperature_change_low"),
+                    confidence_high=proj.get("temperature_change_high"),
+                    baseline_value=proj.get("baseline_temperature"),
                 )
                 self.db.add(record)
 
@@ -93,6 +93,8 @@ class SimulationService:
             run.status = "completed"
             run.completed_at = datetime.utcnow()
             logger.info(f"Simulation completed: {run_id}")
+
+            return projections
 
         except Exception as exc:
             run.status = "failed"

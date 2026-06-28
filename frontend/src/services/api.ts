@@ -29,34 +29,62 @@ export const api = {
   // Scenarios
   async createScenario(config: ScenarioConfig): Promise<Scenario> {
     const response = await client.post('/scenarios', config);
-    return response.data;
+    return response as unknown as Scenario;
   },
 
   async getScenario(id: string): Promise<Scenario> {
     const response = await client.get(`/scenarios/${id}`);
-    return response.data;
+    return response as unknown as Scenario;
+  },
+
+  async listScenarios(): Promise<Scenario[]> {
+    const response = await client.get('/scenarios');
+    return response as unknown as Scenario[];
+  },
+
+  async updateScenario(id: string, data: Partial<ScenarioConfig>): Promise<Scenario> {
+    const response = await client.patch(`/scenarios/${id}`, data);
+    return response as unknown as Scenario;
+  },
+
+  async deleteScenario(id: string): Promise<void> {
+    await client.delete(`/scenarios/${id}`);
   },
 
   // Simulations
-  async runSimulation(scenarioId: string): Promise<{ run_id: string; status: string }> {
+  async runSimulation(scenarioId: string): Promise<SimulationResults> {
     const response = await client.post('/simulate', { scenario_id: scenarioId });
-    return response.data;
+    return response as unknown as SimulationResults;
+  },
+
+  async runInlineSimulation(config: ScenarioConfig): Promise<SimulationResults> {
+    const response = await client.post('/simulate', {
+      city: config.city,
+      country: config.country,
+      target_year: config.targetYear,
+      renewable_energy_slider: config.renewableEnergySlider,
+      public_transit_slider: config.publicTransitSlider,
+      reforestation_slider: config.reforestationSlider,
+      carbon_tax_slider: config.carbonTaxSlider,
+      green_innovation_slider: config.greenInnovationSlider,
+    });
+    return response as unknown as SimulationResults;
   },
 
   async getResults(runId: string): Promise<SimulationResults> {
     const response = await client.get(`/results/${runId}`);
-    return response.data;
+    return response as unknown as SimulationResults;
   },
 
   async getHistory(): Promise<HistoryItem[]> {
     const response = await client.get('/history');
-    return response.data;
+    return response as unknown as HistoryItem[];
   },
 
   // Recommendations
   async getRecommendations(runId: string): Promise<Recommendations> {
     const response = await client.get(`/recommendations/${runId}`);
-    return response.data;
+    return response as unknown as Recommendations;
   },
 
   // Datasets
@@ -69,6 +97,6 @@ export const api = {
     const response = await client.post('/datasets/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
-    return response.data;
+    return response as unknown as { id: string };
   },
 };

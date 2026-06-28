@@ -25,8 +25,10 @@ class TestProjectionEngine:
         
         assert len(projections) == 6  # 2024-2029
         assert "year" in projections[0]
-        assert "temperature" in projections[0]
-        assert "co2_emissions" in projections[0]
+        assert "temperature_change" in projections[0]
+        assert "co2_level" in projections[0]
+        assert "air_quality_index" in projections[0]
+        assert "forest_cover" in projections[0]
 
 
 class TestClimatePipeline:
@@ -101,3 +103,54 @@ class TestProjectionExplainer:
         assert "summary" in explanation
         assert "metrics" in explanation
         assert "confidence" in explanation
+
+
+class TestClimateDataLoader:
+    """Test climate data loader service."""
+    
+    def setup_method(self):
+        from app.services.climate_data_loader import ClimateDataLoader
+        import os
+        # Use the sample data directory relative to backend
+        data_dir = os.path.join(os.path.dirname(__file__), "..", "data", "sample")
+        self.loader = ClimateDataLoader(data_dir=data_dir)
+    
+    def test_load_csv(self):
+        """Test loading a CSV file."""
+        dataset = self.loader.load_csv("global_climate_data.csv", region="Global")
+        
+        assert len(dataset.records) == 10
+        assert dataset.region == "Global"
+        assert dataset.records[0].year == 2015
+        assert dataset.records[-1].year == 2024
+    
+    def test_csv_validation(self):
+        """Test that CSV data is validated by Pydantic."""
+        dataset = self.loader.load_csv("global_climate_data.csv")
+        
+        # All records should be valid ClimateDataRecord instances
+        for record in dataset.records:
+            assert 1900 <= record.year <= 2100
+            assert -50 <= record.temperature <= 60
+            assert 150 <= record.co2_level <= 1000
+            assert 0 <= record.air_quality_index <= 500
+            assert 0 <= record.forest_cover <= 100
+            assert 0 <= record.biodiversity_score <= 1
+            assert 0 <= record.flood_risk <= 1
+            assert 0 <= record.heatwave_frequency <= 365
+    
+    def test_get_baseline(self):
+        """Test getting baseline data for a year."""
+        baseline = self.loader.get_baseline("global_climate_data.csv", base_year=2024)
+        
+        assert baseline is not None
+        assert baseline.year == 2024
+    
+    def test_list_datasets(self):
+        """Test listing available datasets."""
+        datasets = self.loader.list_available_datasets()
+        
+        assert len(datasets) >= 4
+        regions = [d["region"] for d in datasets]
+        assert "Global" in regions
+        assert "Europe" in regions

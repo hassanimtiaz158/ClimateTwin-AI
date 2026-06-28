@@ -7,20 +7,57 @@ from app.models import Scenario, SimulationRun, ProjectionResult, Dataset
 
 
 def test_scenario_creation():
-    """Test scenario model creation."""
+    """Test scenario model creation with new fields."""
     scenario = Scenario(
         name="Test Scenario",
-        region="Global",
-        actions=["renewable_energy", "public_transit"],
-        start_year=2024,
-        end_year=2034,
+        city="Tokyo",
+        country="Japan",
+        target_year=2035,
+        renewable_energy_slider=0.7,
+        public_transit_slider=0.5,
+        reforestation_slider=0.3,
+        carbon_tax_slider=0.0,
+        green_innovation_slider=0.2,
+        notes="Testing model creation",
     )
     
     assert scenario.name == "Test Scenario"
-    assert scenario.region == "Global"
-    assert len(scenario.actions) == 2
+    assert scenario.city == "Tokyo"
+    assert scenario.country == "Japan"
+    assert scenario.target_year == 2035
+    assert scenario.renewable_energy_slider == 0.7
+    assert scenario.notes == "Testing model creation"
+    
+    # Test derived properties
+    assert scenario.region == "Tokyo, Japan"
+    assert "renewable_energy" in scenario.actions
+    assert "public_transit" in scenario.actions
+    assert "reforestation" not in scenario.actions  # 0.3 < 0.5 threshold
     assert scenario.start_year == 2024
-    assert scenario.end_year == 2034
+    assert scenario.end_year == 2035
+
+
+def test_scenario_actions_from_sliders():
+    """Test that actions are derived from slider values."""
+    scenario = Scenario(
+        name="Actions Test",
+        city="Global",
+        country="Global",
+        target_year=2030,
+        renewable_energy_slider=0.8,  # > 0.5 -> active
+        public_transit_slider=0.4,    # < 0.5 -> inactive
+        reforestation_slider=0.6,     # > 0.5 -> active
+        carbon_tax_slider=0.9,        # > 0.5 -> active
+        green_innovation_slider=0.7,  # > 0.5 -> green_buildings & waste_reduction
+    )
+    
+    actions = scenario.actions
+    assert "renewable_energy" in actions
+    assert "public_transit" not in actions
+    assert "reforestation" in actions
+    assert "carbon_tax" in actions
+    assert "green_buildings" in actions
+    assert "waste_reduction" in actions
 
 
 def test_simulation_run_creation():
