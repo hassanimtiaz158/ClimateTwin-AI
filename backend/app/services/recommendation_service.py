@@ -103,7 +103,7 @@ class RecommendationService:
                 findings.append(
                     "CO2 levels continue to rise. Carbon pricing recommended."
                 )
-                if "carbon_tax" not in actions:
+                if "emission_reduction" not in actions:
                     recommended_actions.append(
                         RecommendationAction(
                             title="Implement Carbon Tax",
@@ -197,13 +197,13 @@ class RecommendationService:
                 )
             )
 
-        if "carbon_tax" not in current_actions and scenario.carbon_tax_slider < 0.3:
+        if "emission_reduction" not in current_actions and scenario.emission_reduction_slider < 0.3:
             missing.append(
                 RecommendationAction(
-                    title="Implement Carbon Pricing",
+                    title="Implement Emission Reduction Targets",
                     description=(
-                        "Carbon taxes drive industry-wide emission reductions "
-                        "and generate green investment revenue."
+                        "Setting binding emission reduction targets drives "
+                        "industry-wide cuts and generates green investment."
                     ),
                     priority="high",
                     impact="20-30% industrial emission reduction",
@@ -218,11 +218,12 @@ class RecommendationService:
 
         # Very low sliders
         sliders = {
-            "renewable_energy": scenario.renewable_energy_slider,
-            "public_transit": scenario.public_transit_slider,
             "reforestation": scenario.reforestation_slider,
-            "carbon_tax": scenario.carbon_tax_slider,
-            "green_innovation": scenario.green_innovation_slider,
+            "renewable_energy": scenario.renewable_energy_slider,
+            "ev_adoption": scenario.ev_adoption_slider,
+            "emission_reduction": scenario.emission_reduction_slider,
+            "public_transit": scenario.public_transit_slider,
+            "water_conservation": scenario.water_conservation_slider,
         }
 
         low_sliders = [k for k, v in sliders.items() if v < 0.2]
@@ -232,7 +233,7 @@ class RecommendationService:
                     title="Increase Policy Ambition",
                     description=(
                         "Multiple policy sliders are below 20%. Consider increasing "
-                        "ambition across renewable energy, transit, and reforestation."
+                        "ambition across reforestation, renewable energy, and transit."
                     ),
                     priority="medium",
                     impact="Significant emission reduction potential",

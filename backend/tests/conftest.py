@@ -63,6 +63,20 @@ async def _override_get_db() -> AsyncGenerator[AsyncSession, None]:
 fastapi_app.dependency_overrides[get_db] = _override_get_db
 
 
+# ── DB session fixture (for service/repo tests) ────────────────
+@pytest.fixture
+async def db_session() -> AsyncGenerator[AsyncSession, None]:
+    async with TestSessionLocal() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()
+
+
 # ── HTTP client fixture ───────────────────────────────────────
 @pytest.fixture
 async def client() -> AsyncGenerator[AsyncClient, None]:
