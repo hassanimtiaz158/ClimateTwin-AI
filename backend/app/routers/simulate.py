@@ -2,6 +2,7 @@
 Simulation Router - Run climate projection simulations.
 """
 
+import logging
 from typing import Dict, List
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
@@ -10,7 +11,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.schemas.simulation import (
     SimulationRequest,
-    SimulationResponse,
     SimulationResultResponse,
     SimulationMetrics,
     ChartDataPoint,
@@ -19,6 +19,7 @@ from app.services.simulation_service import SimulationService
 from app.models.scenario import Scenario
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.post(
@@ -74,9 +75,10 @@ async def run_simulation(
     try:
         projections = await service.execute_with_projections(run.id)
     except Exception as e:
+        logger.exception("Simulation failed for run %s", run.id)
         raise HTTPException(
             status_code=500,
-            detail=f"Simulation failed: {str(e)}",
+            detail="Simulation failed. Please try again.",
         )
 
     # Calculate summary metrics

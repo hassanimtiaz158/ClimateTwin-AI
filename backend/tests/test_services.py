@@ -3,9 +3,8 @@
 import pytest
 
 from app.services.projection_engine import ProjectionEngine
-from app.ai.pipeline import ClimatePipeline
+from app.ai.pipeline import ClimatePipeline, ProjectionExplainer
 from app.ai.forecasters import StatisticalForecaster, EnsembleForecaster
-from app.ai.explainer import ProjectionExplainer
 
 
 class TestProjectionEngine:
@@ -83,26 +82,25 @@ class TestForecasters:
 
 class TestProjectionExplainer:
     """Test projection explainer."""
-    
+
     def setup_method(self):
         self.explainer = ProjectionExplainer()
-    
+
     def test_explain_projection(self):
         """Test projection explanation."""
         projections = [
-            {"year": 2024, "temperature": 14.5, "co2_emissions": 400},
-            {"year": 2029, "temperature": 14.3, "co2_emissions": 350},
+            {"year": 2024, "temperature_change": 1.0, "co2_level": 400},
+            {"year": 2029, "temperature_change": 1.2, "co2_level": 420},
         ]
-        
-        explanation = self.explainer.explain_projection(
+
+        explanation = self.explainer.explain(
             projections=projections,
             actions=["renewable_energy"],
-            region="Global",
         )
-        
-        assert "summary" in explanation
-        assert "metrics" in explanation
-        assert "confidence" in explanation
+
+        assert "temp_change" in explanation
+        assert "co2_change" in explanation
+        assert "actions_applied" in explanation
 
 
 class TestClimateDataLoader:

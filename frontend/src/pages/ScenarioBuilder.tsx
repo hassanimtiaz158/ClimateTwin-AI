@@ -154,7 +154,7 @@ interface ValidationErrors {
 
 export default function ScenarioBuilder() {
   const navigate = useNavigate();
-  const { cacheResults, setSimulating, setSimulationError } = useStore();
+  const { cacheResults } = useStore();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1); // 1: Location, 2: Actions, 3: Review
   const [errors, setErrors] = useState<ValidationErrors>({});
@@ -309,8 +309,6 @@ export default function ScenarioBuilder() {
     }
 
     setLoading(true);
-    setSimulating(true);
-    setSimulationError(null);
 
     try {
       const result = await api.runInlineSimulation(config);
@@ -324,15 +322,15 @@ export default function ScenarioBuilder() {
       const msg = error instanceof ApiError
         ? error.detail
         : 'Failed to run simulation. Please try again.';
-      setSimulationError(msg);
       toast.error(msg);
     } finally {
       setLoading(false);
-      setSimulating(false);
     }
   };
 
   // ── Step Indicators ──────────────────────────────────────
+  const stepLabels = ['Location & Details', 'Climate Actions', 'Review & Run'];
+
   const StepIndicator = () => (
     <div className="flex items-center justify-center mb-8">
       {[1, 2, 3].map((s, idx) => (
@@ -364,8 +362,6 @@ export default function ScenarioBuilder() {
       ))}
     </div>
   );
-
-  const stepLabels = ['Location & Details', 'Climate Actions', 'Review & Run'];
 
   // ── Step 1: Location & Details ───────────────────────────
   const renderStep1 = () => (
@@ -755,18 +751,6 @@ export default function ScenarioBuilder() {
 
       {/* Step Indicator */}
       <StepIndicator />
-      <div className="flex justify-center gap-8 mb-8">
-        {stepLabels.map((label, idx) => (
-          <div
-            key={idx}
-            className={`text-sm font-medium ${
-              step === idx + 1 ? 'text-primary-600' : step > idx + 1 ? 'text-gray-600' : 'text-gray-400'
-            }`}
-          >
-            {label}
-          </div>
-        ))}
-      </div>
 
       {/* Step Content */}
       <div className="min-h-[400px]">

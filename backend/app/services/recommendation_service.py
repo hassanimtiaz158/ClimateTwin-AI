@@ -53,6 +53,7 @@ class RecommendationService:
 
         # Generate data-driven recommendations
         recommendations = self._generate_data_driven_recommendations(
+            run_id=run.id,
             scenario=scenario,
             projections=projections,
         )
@@ -61,6 +62,7 @@ class RecommendationService:
 
     def _generate_data_driven_recommendations(
         self,
+        run_id: UUID,
         scenario: Scenario,
         projections: List[ProjectionResult],
     ) -> RecommendationResponse:
@@ -157,7 +159,7 @@ class RecommendationService:
         summary = self._generate_summary(scenario, actions, projections)
 
         return RecommendationResponse(
-            run_id=scenario.id,
+            run_id=run_id,
             summary=summary,
             findings=findings,
             actions=recommended_actions[:6],  # Limit to 6 recommendations

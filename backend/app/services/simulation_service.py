@@ -2,10 +2,11 @@
 Simulation Service - Orchestrates simulation execution.
 """
 
+import asyncio
 import logging
 from typing import Any, Dict, List, Optional
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,7 +35,7 @@ class SimulationService:
 
     async def create_run(self, scenario_id: UUID) -> SimulationRun:
         """Create a new simulation run record."""
-        logger.info(f"Creating simulation run for scenario: {scenario_id}")
+        logger.info("Creating simulation run for scenario: %s", scenario_id)
 
         run = SimulationRun(
             scenario_id=scenario_id,
@@ -44,39 +45,36 @@ class SimulationService:
         await self.db.flush()
         await self.db.refresh(run)
 
-        logger.info(f"Simulation run created: {run.id}")
+        logger.info("Simulation run created: %s", run.id)
         return run
 
     async def execute_with_projections(self, run_id: UUID) -> List[Dict[str, Any]]:
         """Execute the simulation and return projections."""
-        logger.info(f"Executing simulation: {run_id}")
+        logger.info("Executing simulation: %s", run_id)
 
-        # Fetch run record
         result = await self.db.execute(
             select(SimulationRun).where(SimulationRun.id == run_id)
         )
         run = result.scalar_one()
 
-        # Update to running
         run.status = "running"
-        run.started_at = datetime.utcnow()
+        run.started_at = datetime.now(timezone.utc)
         await self.db.flush()
 
         try:
-            # Fetch associated scenario
             scenario = await self.get_scenario(run.scenario_id)
             if not scenario:
                 raise ValueError(f"Scenario {run.scenario_id} not found")
 
-            # Run projection engine
-            projections = self.projection_engine.run(
-                actions=scenario.actions,
-                start_year=scenario.start_year,
-                end_year=scenario.end_year,
-                region=scenario.region,
+            projections = await asyncio.get_event_loop().run_in_executor(
+                None,
+                self.projection_engine.run,
+                scenario.actions,
+                scenario.start_year,
+                scenario.end_year,
+                scenario.region,
             )
 
-            # Persist projection results
             for proj in projections:
                 record = ProjectionResult(
                     simulation_run_id=run_id,
@@ -89,21 +87,20 @@ class SimulationService:
                 )
                 self.db.add(record)
 
-            # Mark completed
             run.status = "completed"
-            run.completed_at = datetime.utcnow()
-            logger.info(f"Simulation completed: {run_id}")
+            run.completed_at = datetime.now(timezone.utc)
+            await self.db.flush()
+            logger.info("Simulation completed: %s", run_id)
 
             return projections
 
         except Exception as exc:
             run.status = "failed"
             run.error_message = str(exc)
-            run.completed_at = datetime.utcnow()
-            logger.error(f"Simulation failed: {run_id} - {exc}")
+            run.completed_at = datetime.now(timezone.utc)
+            await self.db.flush()
+            logger.error("Simulation failed: %s - %s", run_id, exc)
             raise
-
-        await self.db.flush()
 
     async def get_history(self, skip: int = 0, limit: int = 50) -> List[SimulationRun]:
         """Get simulation history."""

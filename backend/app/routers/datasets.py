@@ -4,7 +4,7 @@ Datasets Router - Upload and manage climate datasets.
 
 from typing import List, Optional
 from uuid import UUID
-from fastapi import APIRouter, Depends, File, Form, UploadFile, HTTPException
+from fastapi import APIRouter, Depends, File, Form, Query, UploadFile, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -56,13 +56,13 @@ async def upload_dataset(
     summary="List all datasets",
 )
 async def list_datasets(
-    skip: int = Form(0),
-    limit: int = Form(100),
+    skip: int = Query(0, ge=0, description="Number of records to skip"),
+    limit: int = Query(100, ge=1, le=500, description="Max records to return"),
     db: AsyncSession = Depends(get_db),
 ):
     """List all uploaded datasets with pagination."""
     service = DatasetService(db)
-    datasets = await service.list(skip=skip, limit=limit)
+    datasets = await service.list_all(skip=skip, limit=limit)
     return datasets
 
 

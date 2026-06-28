@@ -3,7 +3,6 @@ import { useStore } from '../store/useStore';
 
 describe('useStore', () => {
   beforeEach(() => {
-    // Reset store state between tests
     useStore.setState({
       currentScenario: {
         name: '',
@@ -18,9 +17,6 @@ describe('useStore', () => {
         waterConservationSlider: 0.0,
       },
       resultsCache: {},
-      sidebarOpen: true,
-      isSimulating: false,
-      simulationError: null,
     });
   });
 
@@ -115,33 +111,6 @@ describe('useStore', () => {
       cacheResults('run-x', {} as any);
       clearResultsCache();
       expect(useStore.getState().resultsCache).toEqual({});
-    });
-  });
-
-  describe('UI state', () => {
-    it('toggleSidebar toggles', () => {
-      const { toggleSidebar } = useStore.getState();
-      expect(useStore.getState().sidebarOpen).toBe(true);
-      toggleSidebar();
-      expect(useStore.getState().sidebarOpen).toBe(false);
-      toggleSidebar();
-      expect(useStore.getState().sidebarOpen).toBe(true);
-    });
-
-    it('setSimulating updates state', () => {
-      const { setSimulating } = useStore.getState();
-      setSimulating(true);
-      expect(useStore.getState().isSimulating).toBe(true);
-      setSimulating(false);
-      expect(useStore.getState().isSimulating).toBe(false);
-    });
-
-    it('setSimulationError updates state', () => {
-      const { setSimulationError } = useStore.getState();
-      setSimulationError('Something went wrong');
-      expect(useStore.getState().simulationError).toBe('Something went wrong');
-      setSimulationError(null);
-      expect(useStore.getState().simulationError).toBeNull();
     });
   });
 });

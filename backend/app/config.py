@@ -38,8 +38,8 @@ class Settings(BaseSettings):
 
     # ── Security ─────────────────────────────────────────────
     SECRET_KEY: str = Field(
-        default="super-secret-change-in-production",
-        description="JWT signing secret.",
+        default="",
+        description="JWT signing secret. Must be set in production.",
     )
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(
         default=30, ge=1, le=1440, description="JWT token lifetime in minutes."
@@ -49,7 +49,7 @@ class Settings(BaseSettings):
     # ── Server ───────────────────────────────────────────────
     API_HOST: str = Field(default="0.0.0.0", description="Uvicorn bind host.")
     API_PORT: int = Field(default=8000, ge=1, le=65535, description="Uvicorn bind port.")
-    DEBUG: bool = Field(default=True, description="Toggle debug / dev mode.")
+    DEBUG: bool = Field(default=False, description="Toggle debug / dev mode.")
 
     # ── CORS ─────────────────────────────────────────────────
     CORS_ORIGINS: List[str] = Field(

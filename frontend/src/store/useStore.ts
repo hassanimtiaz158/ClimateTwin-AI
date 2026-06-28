@@ -2,26 +2,14 @@ import { create } from 'zustand';
 import type { ScenarioConfig, SimulationResults } from '../types';
 
 interface AppState {
-  // Current scenario being built
   currentScenario: Partial<ScenarioConfig>;
   setCurrentScenario: (scenario: Partial<ScenarioConfig>) => void;
   resetCurrentScenario: () => void;
 
-  // Simulation results cache (keyed by runId)
   resultsCache: Record<string, SimulationResults>;
   cacheResults: (runId: string, results: SimulationResults) => void;
   getCachedResults: (runId: string) => SimulationResults | null;
   clearResultsCache: () => void;
-
-  // UI State
-  sidebarOpen: boolean;
-  toggleSidebar: () => void;
-
-  // Simulation status
-  isSimulating: boolean;
-  setSimulating: (v: boolean) => void;
-  simulationError: string | null;
-  setSimulationError: (msg: string | null) => void;
 }
 
 const initialScenario: Partial<ScenarioConfig> = {
@@ -38,12 +26,12 @@ const initialScenario: Partial<ScenarioConfig> = {
 };
 
 export const useStore = create<AppState>((set, get) => ({
-  currentScenario: initialScenario,
+  currentScenario: { ...initialScenario },
   setCurrentScenario: (scenario) =>
     set((state) => ({
       currentScenario: { ...state.currentScenario, ...scenario },
     })),
-  resetCurrentScenario: () => set({ currentScenario: initialScenario }),
+  resetCurrentScenario: () => set({ currentScenario: { ...initialScenario } }),
 
   resultsCache: {},
   cacheResults: (runId, results) =>
@@ -52,12 +40,4 @@ export const useStore = create<AppState>((set, get) => ({
     })),
   getCachedResults: (runId) => get().resultsCache[runId] ?? null,
   clearResultsCache: () => set({ resultsCache: {} }),
-
-  sidebarOpen: true,
-  toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-
-  isSimulating: false,
-  setSimulating: (v) => set({ isSimulating: v }),
-  simulationError: null,
-  setSimulationError: (msg) => set({ simulationError: msg }),
 }));

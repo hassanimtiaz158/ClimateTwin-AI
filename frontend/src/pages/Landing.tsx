@@ -1,5 +1,6 @@
 ﻿import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import {
   SparklesIcon,
   ChartBarIcon,
@@ -133,7 +134,7 @@ function DemoCard({ demo }: { demo: typeof DEMO_SCENARIOS[0] }) {
       navigate(`/dashboard/${result.run_id}`);
     } catch (err) {
       const msg = err instanceof ApiError ? err.detail : 'Demo failed. Is the backend running?';
-      alert(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

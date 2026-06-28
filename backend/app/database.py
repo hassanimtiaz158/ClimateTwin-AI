@@ -40,7 +40,7 @@ _engine_kwargs: dict = dict(
 )
 
 if "sqlite" in _async_url:
-    _engine_kwargs.update(poolclass=None, connect_args={"check_same_thread": False})
+    _engine_kwargs.update(connect_args={"check_same_thread": False})
 else:
     _engine_kwargs.update(pool_size=10, max_overflow=20, pool_recycle=3600)
 

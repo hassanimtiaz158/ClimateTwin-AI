@@ -78,8 +78,12 @@ def create_app() -> FastAPI:
     register_middleware(_app)
 
     # ── Global error handler ──────────────────────────────────
+    from fastapi import HTTPException
+
     @_app.exception_handler(Exception)
     async def _unhandled(request: Request, exc: Exception):
+        if isinstance(exc, HTTPException):
+            raise exc
         logger.exception("Unhandled error on %s %s", request.method, request.url.path)
         return JSONResponse(
             status_code=500,

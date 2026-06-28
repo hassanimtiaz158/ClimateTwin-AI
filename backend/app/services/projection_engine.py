@@ -8,7 +8,6 @@ from typing import List, Dict, Any, Optional
 import os
 
 from app.ai.pipeline import ClimatePipeline, ProjectionExplainer, INDICATORS
-from app.ai.forecasters import get_forecaster
 
 
 class ProjectionEngine:

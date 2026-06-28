@@ -6,7 +6,6 @@ for 8 climate indicators.
 """
 
 from typing import Dict, List, Any, Optional
-import pandas as pd
 import numpy as np
 
 from app.services.climate_data_loader import get_data_loader, ClimateDataRecord

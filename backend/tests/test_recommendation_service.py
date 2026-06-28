@@ -78,7 +78,7 @@ class TestBasicGeneration:
         await _add_projection(db_session, run.id, 2034, 1.5)
         result = await service.generate(run.id)
         assert result is not None
-        assert result.run_id == scenario.id
+        assert result.run_id == run.id
 
     @pytest.mark.asyncio
     async def test_findings_populated(self, db_session, service):
