@@ -1,6 +1,7 @@
 """Alembic environment configuration."""
 
 import asyncio
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import pool
@@ -15,6 +16,11 @@ from app.models import *  # noqa: Ensure all models are imported
 
 # Alembic Config object
 config = context.config
+
+# Prefer the Render DATABASE_URL env var over the ini placeholder.
+db_url = os.environ.get("DATABASE_URL")
+if db_url:
+    config.set_main_option("sqlalchemy.url", db_url)
 
 # Interpret the config file for Python logging
 if config.config_file_name is not None:
