@@ -271,7 +271,7 @@ export default function ScenarioBuilder() {
   };
 
   const getSliderColorClass = (value: number): string => {
-    if (value >= 0.7) return 'from-climate-green to-emerald-500';
+    if (value >= 0.7) return 'from-primary-500 to-emerald-500';
     if (value >= 0.4) return 'from-climate-yellow to-amber-500';
     return 'from-gray-300 to-gray-400';
   };
@@ -334,23 +334,28 @@ export default function ScenarioBuilder() {
   // ── Step Indicators ──────────────────────────────────────
   const StepIndicator = () => (
     <div className="flex items-center justify-center mb-8">
-      {[1, 2, 3].map((s) => (
+      {[1, 2, 3].map((s, idx) => (
         <div key={s} className="flex items-center">
-          <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
-              step === s
-                ? 'bg-climate-green text-white scale-110 shadow-lg'
-                : step > s
-                ? 'bg-climate-green text-white'
-                : 'bg-gray-200 text-gray-500'
-            }`}
-          >
-            {step > s ? <CheckCircleIcon className="h-6 w-6" /> : s}
+          <div className="flex flex-col items-center">
+            <div
+              className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
+                step === s
+                  ? 'bg-primary-500 text-white scale-110 shadow-lg'
+                  : step > s
+                  ? 'bg-primary-500 text-white'
+                  : 'bg-gray-200 text-gray-500'
+              }`}
+            >
+              {step > s ? <CheckCircleIcon className="h-6 w-6" /> : s}
+            </div>
+            <span className={`text-xs mt-1.5 font-medium ${step === s ? 'text-primary-600' : step > s ? 'text-gray-600' : 'text-gray-400'}`}>
+              {stepLabels[idx]}
+            </span>
           </div>
           {s < 3 && (
             <div
-              className={`w-20 h-1 mx-2 transition-all duration-300 ${
-                step > s ? 'bg-climate-green' : 'bg-gray-200'
+              className={`w-20 h-1 mx-2 mb-5 transition-all duration-300 ${
+                step > s ? 'bg-primary-500' : 'bg-gray-200'
               }`}
             />
           )}
@@ -363,12 +368,12 @@ export default function ScenarioBuilder() {
 
   // ── Step 1: Location & Details ───────────────────────────
   const renderStep1 = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-slide-up">
       {/* Scenario Name */}
       <div className="card">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-climate-green/10 rounded-lg">
-            <SparklesIcon className="h-5 w-5 text-climate-green" />
+          <div className="p-2 bg-primary-50 rounded-lg">
+            <SparklesIcon className="h-5 w-5 text-primary-600" />
           </div>
           <h2 className="text-lg font-semibold">Scenario Name</h2>
         </div>
@@ -391,8 +396,8 @@ export default function ScenarioBuilder() {
       {/* Location Selection */}
       <div className="card">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-climate-blue/10 rounded-lg">
-            <MapPinIcon className="h-5 w-5 text-climate-blue" />
+          <div className="p-2 bg-blue-50 rounded-lg">
+            <MapPinIcon className="h-5 w-5 text-blue-600" />
           </div>
           <h2 className="text-lg font-semibold">Location</h2>
         </div>
@@ -402,7 +407,7 @@ export default function ScenarioBuilder() {
               Country <span className="text-red-500">*</span>
             </label>
             <select
-              className={`input-field w-full ${errors.country ? 'border-red-500' : ''}`}
+              className={`select-field w-full ${errors.country ? 'border-red-500' : ''}`}
               value={config.country}
               onChange={(e) => {
                 const country = e.target.value;
@@ -433,7 +438,7 @@ export default function ScenarioBuilder() {
               City <span className="text-red-500">*</span>
             </label>
             <select
-              className={`input-field w-full ${errors.city ? 'border-red-500' : ''}`}
+              className={`select-field w-full ${errors.city ? 'border-red-500' : ''}`}
               value={config.city}
               onChange={(e) => handleFieldChange('city', e.target.value)}
               disabled={!config.country}
@@ -459,8 +464,8 @@ export default function ScenarioBuilder() {
       {/* Target Year */}
       <div className="card">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-climate-orange/10 rounded-lg">
-            <CalendarDaysIcon className="h-5 w-5 text-climate-orange" />
+          <div className="p-2 bg-orange-50 rounded-lg">
+            <CalendarDaysIcon className="h-5 w-5 text-orange-500" />
           </div>
           <h2 className="text-lg font-semibold">Target Year</h2>
         </div>
@@ -469,16 +474,16 @@ export default function ScenarioBuilder() {
             <button
               key={ty.year}
               onClick={() => handleFieldChange('targetYear', ty.year)}
-              className={`p-4 rounded-xl border-2 text-center transition-all duration-200 ${
+              className={`p-4 rounded-2xl border-2 text-center transition-all duration-200 ${
                 config.targetYear === ty.year
-                  ? 'border-climate-green bg-climate-green/10 shadow-md'
+                   ? 'border-primary-400 bg-primary-50 shadow-md'
                   : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
-              <div className={`text-2xl font-bold ${config.targetYear === ty.year ? 'text-climate-green' : 'text-gray-700'}`}>
+              <div className={`text-2xl font-bold ${config.targetYear === ty.year ? 'text-primary-600' : 'text-gray-700'}`}>
                 {ty.label}
               </div>
-              <div className={`text-sm font-medium ${config.targetYear === ty.year ? 'text-climate-green' : 'text-gray-500'}`}>
+              <div className={`text-sm font-medium ${config.targetYear === ty.year ? 'text-primary-600' : 'text-gray-500'}`}>
                 {ty.subtitle}
               </div>
               <div className="text-xs text-gray-400 mt-1">{ty.description}</div>
@@ -491,16 +496,16 @@ export default function ScenarioBuilder() {
 
   // ── Step 2: Climate Actions ──────────────────────────────
   const renderStep2 = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-slide-up">
       {errors.sliders && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
           <ExclamationCircleIcon className="h-5 w-5 text-red-500 flex-shrink-0" />
           <p className="text-sm text-red-700">{errors.sliders}</p>
         </div>
       )}
 
       {/* Summary Bar */}
-      <div className="card bg-gradient-to-r from-climate-green/5 to-emerald-50/50">
+      <div className="card bg-gradient-to-r from-primary-500/5 to-emerald-50/50">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-semibold text-gray-800">Climate Action Summary</h3>
@@ -509,7 +514,7 @@ export default function ScenarioBuilder() {
             </p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-climate-green">
+            <div className="text-2xl font-bold text-primary-600">
               {getTotalSliderValue().toFixed(1)}
             </div>
             <div className="text-xs text-gray-500">Total Effort Score</div>
@@ -517,7 +522,7 @@ export default function ScenarioBuilder() {
         </div>
         <div className="mt-3 h-2 bg-gray-200 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-climate-green to-emerald-500 transition-all duration-500"
+            className="h-full bg-gradient-to-r from-primary-500 to-emerald-500 transition-all duration-500"
             style={{ width: `${(getTotalSliderValue() / 6) * 100}%` }}
           />
         </div>
@@ -540,7 +545,7 @@ export default function ScenarioBuilder() {
               <div className="flex flex-col md:flex-row md:items-center gap-4">
                 {/* Icon & Info */}
                 <div className="flex items-start gap-4 flex-1">
-                  <div className={`p-3 rounded-xl bg-gradient-to-br ${action.color} text-white shadow-lg`}>
+                  <div className={`p-3 rounded-2xl bg-gradient-to-br ${action.color} text-white shadow-lg`}>
                     <Icon className="h-6 w-6" />
                   </div>
                   <div className="flex-1">
@@ -569,7 +574,7 @@ export default function ScenarioBuilder() {
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium text-gray-600">{action.sliderLabel}</span>
                     <span className={`text-sm font-bold ${
-                      value >= 0.7 ? 'text-climate-green' : value >= 0.4 ? 'text-climate-yellow' : 'text-gray-400'
+                      value >= 0.7 ? 'text-primary-600' : value >= 0.4 ? 'text-climate-yellow' : 'text-gray-400'
                     }`}>
                       {value.toFixed(1)}
                     </span>
@@ -590,7 +595,7 @@ export default function ScenarioBuilder() {
                         [&::-webkit-slider-thumb]:bg-white
                         [&::-webkit-slider-thumb]:shadow-md
                         [&::-webkit-slider-thumb]:border-2
-                        [&::-webkit-slider-thumb]:border-climate-green
+                        [&::-webkit-slider-thumb]:border-primary-400
                         [&::-webkit-slider-thumb]:cursor-pointer
                         [&::-webkit-slider-thumb]:transition-all
                         [&::-webkit-slider-thumb]:hover:scale-110"
@@ -603,7 +608,7 @@ export default function ScenarioBuilder() {
                   <div className="flex justify-between text-xs text-gray-400">
                     <span>None</span>
                     <span className={`font-medium ${
-                      value >= 0.7 ? 'text-climate-green' : value >= 0.4 ? 'text-climate-yellow' : ''
+                      value >= 0.7 ? 'text-primary-600' : value >= 0.4 ? 'text-climate-yellow' : ''
                     }`}>
                       {getSliderIntensity(value)}
                     </span>
@@ -620,7 +625,7 @@ export default function ScenarioBuilder() {
 
   // ── Step 3: Review & Run ─────────────────────────────────
   const renderStep3 = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-slide-up">
       {/* Scenario Overview */}
       <div className="card">
         <h2 className="text-lg font-semibold mb-4">Scenario Overview</h2>
@@ -697,7 +702,7 @@ export default function ScenarioBuilder() {
       </div>
 
       {/* Info Box */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
+      <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
         <InformationCircleIcon className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
         <div className="text-sm text-blue-700">
           <p className="font-medium">What happens next?</p>
@@ -729,7 +734,7 @@ export default function ScenarioBuilder() {
           <div
             key={idx}
             className={`text-sm font-medium ${
-              step === idx + 1 ? 'text-climate-green' : step > idx + 1 ? 'text-gray-600' : 'text-gray-400'
+              step === idx + 1 ? 'text-primary-600' : step > idx + 1 ? 'text-gray-600' : 'text-gray-400'
             }`}
           >
             {label}
@@ -757,8 +762,8 @@ export default function ScenarioBuilder() {
         {step < 3 ? (
           <button
             onClick={handleNext}
-            className="flex items-center gap-2 px-8 py-3 bg-climate-green text-white rounded-xl font-semibold
-              hover:bg-climate-green/90 transition-all shadow-lg hover:shadow-xl"
+            className="flex items-center gap-2 px-8 py-3 bg-primary-500 text-white rounded-2xl font-semibold
+              hover:bg-primary-500/90 transition-all shadow-lg hover:shadow-xl"
           >
             Next
             <ArrowRightIcon className="h-5 w-5" />
@@ -767,16 +772,13 @@ export default function ScenarioBuilder() {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-climate-green to-emerald-600
-              text-white rounded-xl font-semibold shadow-lg hover:shadow-xl
+            className="btn-primary flex items-center gap-2 px-8 py-3.5 text-base bg-gradient-to-r from-primary-500 to-emerald-600
+              text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl
               disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             {loading ? (
               <>
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
+                <span className="spinner h-5 w-5" />
                 Running Simulation...
               </>
             ) : (

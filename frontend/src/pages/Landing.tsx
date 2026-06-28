@@ -117,20 +117,20 @@ const TECH_STACK = [
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-dark-700 text-white">
+    <div className="min-h-screen bg-forest-700 text-white">
       {/* NAVBAR */}
       <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-dark-300 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-forest-300 flex items-center justify-center">
               <GlobeAltIcon className="h-6 w-6 text-white" />
             </div>
             <span className="text-xl font-display font-bold">ClimateTwin AI</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm text-dark-50 hover:text-white transition-colors">Features</a>
-            <a href="#how-it-works" className="text-sm text-dark-50 hover:text-white transition-colors">How It Works</a>
-            <a href="#tech" className="text-sm text-dark-50 hover:text-white transition-colors">Tech Stack</a>
+            <a href="#features" className="text-sm text-forest-50 hover:text-white transition-colors">Features</a>
+            <a href="#how-it-works" className="text-sm text-forest-50 hover:text-white transition-colors">How It Works</a>
+            <a href="#tech" className="text-sm text-forest-50 hover:text-white transition-colors">Tech Stack</a>
           </div>
           <Link to="/scenario/new" className="btn-cta text-sm px-6 py-2">
             Launch App
@@ -141,13 +141,13 @@ export default function Landing() {
       {/* 1. HERO SECTION */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
         <div className="absolute inset-0 hero-gradient opacity-80" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-dark-700" />
-        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-dark-300/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-dark-400/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-forest-700" />
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-forest-300/20 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-forest-400/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
 
         <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2 glass px-4 py-2 mb-8 text-sm text-dark-50">
-            <SparklesIcon className="h-4 w-4 text-dark-300" />
+          <div className="inline-flex items-center gap-2 glass px-4 py-2 mb-8 text-sm text-forest-50">
+            <SparklesIcon className="h-4 w-4 text-forest-300" />
             AI-Powered Climate Intelligence
           </div>
           <h1 className="font-display text-5xl md:text-7xl font-bold mb-6 leading-tight">
@@ -155,7 +155,7 @@ export default function Landing() {
             <br />
             <span className="text-gradient-green">Climate Today</span>
           </h1>
-          <p className="text-lg md:text-xl text-dark-50 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-lg md:text-xl text-forest-50 max-w-2xl mx-auto mb-10 leading-relaxed">
             AI-powered climate scenario simulation helping governments, researchers,
             and citizens make informed environmental decisions. See how today's choices
             shape the next decade.
@@ -169,17 +169,17 @@ export default function Landing() {
               Learn More
             </a>
           </div>
-          <div className="mt-16 flex flex-wrap items-center justify-center gap-6 text-sm text-dark-100">
+          <div className="mt-16 flex flex-wrap items-center justify-center gap-6 text-sm text-forest-100">
             <div className="flex items-center gap-2">
-              <CheckCircleIcon className="h-4 w-4 text-dark-300" />
+              <CheckCircleIcon className="h-4 w-4 text-forest-300" />
               No signup required
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircleIcon className="h-4 w-4 text-dark-300" />
+              <CheckCircleIcon className="h-4 w-4 text-forest-300" />
               Open source
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircleIcon className="h-4 w-4 text-dark-300" />
+              <CheckCircleIcon className="h-4 w-4 text-forest-300" />
               Free for researchers
             </div>
           </div>
@@ -190,11 +190,11 @@ export default function Landing() {
       <section className="py-24 px-6 section-alt">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-dark-300 text-sm font-semibold uppercase tracking-wider">The Problem</span>
+            <span className="text-forest-300 text-sm font-semibold uppercase tracking-wider">The Problem</span>
             <h2 className="font-display text-3xl md:text-5xl font-bold mt-4 mb-6">
               Climate Action is <span className="text-climate-orange">Too Slow</span>
             </h2>
-            <p className="text-dark-50 text-lg max-w-2xl mx-auto">
+            <p className="text-forest-50 text-lg max-w-2xl mx-auto">
               Decision-makers are drowning in data but starving for actionable insights.
               The gap between climate science and climate action is widening.
             </p>
@@ -206,7 +206,7 @@ export default function Landing() {
                   <problem.icon className={`h-8 w-8 ${problem.color}`} />
                 </div>
                 <h3 className="text-xl font-semibold mb-3">{problem.title}</h3>
-                <p className="text-dark-50 leading-relaxed">{problem.description}</p>
+                <p className="text-forest-50 leading-relaxed">{problem.description}</p>
               </div>
             ))}
           </div>
@@ -218,13 +218,13 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <span className="text-dark-300 text-sm font-semibold uppercase tracking-wider">Our Solution</span>
+              <span className="text-forest-300 text-sm font-semibold uppercase tracking-wider">Our Solution</span>
               <h2 className="font-display text-3xl md:text-5xl font-bold mt-4 mb-6">
                 Climate Intelligence
                 <br />
                 <span className="text-gradient-green">in Plain English</span>
               </h2>
-              <p className="text-dark-50 text-lg mb-8 leading-relaxed">
+              <p className="text-forest-50 text-lg mb-8 leading-relaxed">
                 ClimateTwin AI bridges the gap between complex climate models and
                 actionable decisions. Our platform translates scientific data into
                 clear, visual, and explainable insights that anyone can understand.
@@ -237,8 +237,8 @@ export default function Landing() {
                   'Export reports for stakeholders',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3">
-                    <CheckCircleIcon className="h-5 w-5 text-dark-300 mt-0.5 flex-shrink-0" />
-                    <span className="text-dark-100">{item}</span>
+                    <CheckCircleIcon className="h-5 w-5 text-forest-300 mt-0.5 flex-shrink-0" />
+                    <span className="text-forest-100">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -252,21 +252,21 @@ export default function Landing() {
                 <div className="browser-dot bg-climate-red" />
                 <div className="browser-dot bg-climate-orange" />
                 <div className="browser-dot bg-climate-green" />
-                <span className="text-xs text-dark-100 ml-2">climatetwin.ai/dashboard</span>
+                <span className="text-xs text-forest-100 ml-2">climatetwin.ai/dashboard</span>
               </div>
-              <div className="p-6 bg-dark-800">
+              <div className="p-6 bg-forest-800">
                 <div className="grid grid-cols-3 gap-3 mb-4">
                   <div className="bg-white/5 rounded-lg p-3 text-center">
-                    <div className="text-xs text-dark-100">Temp Change</div>
+                    <div className="text-xs text-forest-100">Temp Change</div>
                     <div className="text-lg font-bold text-climate-orange">+0.4C</div>
                   </div>
                   <div className="bg-white/5 rounded-lg p-3 text-center">
-                    <div className="text-xs text-dark-100">CO2 Reduction</div>
+                    <div className="text-xs text-forest-100">CO2 Reduction</div>
                     <div className="text-lg font-bold text-climate-green">-12.5%</div>
                   </div>
                   <div className="bg-white/5 rounded-lg p-3 text-center">
-                    <div className="text-xs text-dark-100">Air Quality</div>
-                    <div className="text-lg font-bold text-dark-300">AQI 38</div>
+                    <div className="text-xs text-forest-100">Air Quality</div>
+                    <div className="text-lg font-bold text-forest-300">AQI 38</div>
                   </div>
                 </div>
                 <div className="bg-white/5 rounded-lg p-4 h-32 flex items-end gap-1">
@@ -290,13 +290,13 @@ export default function Landing() {
       <section id="features" className="py-24 px-6 section-alt">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-dark-300 text-sm font-semibold uppercase tracking-wider">Features</span>
+            <span className="text-forest-300 text-sm font-semibold uppercase tracking-wider">Features</span>
             <h2 className="font-display text-3xl md:text-5xl font-bold mt-4 mb-6">
               Everything You Need to
               <br />
               <span className="text-gradient-green">Plan for Tomorrow</span>
             </h2>
-            <p className="text-dark-50 text-lg max-w-2xl mx-auto">
+            <p className="text-forest-50 text-lg max-w-2xl mx-auto">
               From data ingestion to actionable insights, ClimateTwin provides
               a complete climate intelligence pipeline.
             </p>
@@ -304,11 +304,11 @@ export default function Landing() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {FEATURES.map((feature) => (
               <div key={feature.title} className="glass p-8 hover:bg-white/10 transition-all duration-300 group">
-                <div className="inline-flex p-3 rounded-xl bg-dark-300/20 mb-6 group-hover:bg-dark-300/30 transition-colors">
-                  <feature.icon className="h-6 w-6 text-dark-300" />
+                <div className="inline-flex p-3 rounded-xl bg-forest-300/20 mb-6 group-hover:bg-forest-300/30 transition-colors">
+                  <feature.icon className="h-6 w-6 text-forest-300" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                <p className="text-dark-50 leading-relaxed">{feature.description}</p>
+                <p className="text-forest-50 leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -319,7 +319,7 @@ export default function Landing() {
       <section id="how-it-works" className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-dark-300 text-sm font-semibold uppercase tracking-wider">How It Works</span>
+            <span className="text-forest-300 text-sm font-semibold uppercase tracking-wider">How It Works</span>
             <h2 className="font-display text-3xl md:text-5xl font-bold mt-4 mb-6">
               Four Steps to
               <br />
@@ -330,12 +330,12 @@ export default function Landing() {
             {STEPS.map((step, i) => (
               <div key={step.number} className="relative">
                 {i < STEPS.length - 1 && (
-                  <div className="hidden md:block absolute top-12 left-full w-full h-px bg-gradient-to-r from-dark-300/50 to-transparent z-0" />
+                  <div className="hidden md:block absolute top-12 left-full w-full h-px bg-gradient-to-r from-forest-300/50 to-transparent z-0" />
                 )}
                 <div className="relative glass p-8 text-center">
-                  <div className="text-4xl font-display font-bold text-dark-300/30 mb-4">{step.number}</div>
+                  <div className="text-4xl font-display font-bold text-forest-300/30 mb-4">{step.number}</div>
                   <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
-                  <p className="text-dark-50 leading-relaxed">{step.description}</p>
+                  <p className="text-forest-50 leading-relaxed">{step.description}</p>
                 </div>
               </div>
             ))}
@@ -347,7 +347,7 @@ export default function Landing() {
       <section className="py-24 px-6 section-alt">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-dark-300 text-sm font-semibold uppercase tracking-wider">Impact</span>
+            <span className="text-forest-300 text-sm font-semibold uppercase tracking-wider">Impact</span>
             <h2 className="font-display text-3xl md:text-5xl font-bold mt-4 mb-6">
               Trusted by <span className="text-gradient-green">Researchers Worldwide</span>
             </h2>
@@ -359,7 +359,7 @@ export default function Landing() {
                   {metric.value}
                 </div>
                 <div className="text-white font-semibold mb-1">{metric.label}</div>
-                <div className="text-dark-100 text-sm">{metric.description}</div>
+                <div className="text-forest-100 text-sm">{metric.description}</div>
               </div>
             ))}
           </div>
@@ -370,7 +370,7 @@ export default function Landing() {
       <section className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-dark-300 text-sm font-semibold uppercase tracking-wider">Demo</span>
+            <span className="text-forest-300 text-sm font-semibold uppercase tracking-wider">Demo</span>
             <h2 className="font-display text-3xl md:text-5xl font-bold mt-4 mb-6">
               See <span className="text-gradient-green">ClimateTwin</span> in Action
             </h2>
@@ -380,35 +380,35 @@ export default function Landing() {
               <div className="browser-dot bg-climate-red" />
               <div className="browser-dot bg-climate-orange" />
               <div className="browser-dot bg-climate-green" />
-              <span className="text-xs text-dark-100 ml-2">climatetwin.ai/simulation</span>
+              <span className="text-xs text-forest-100 ml-2">climatetwin.ai/simulation</span>
             </div>
-            <div className="p-8 bg-dark-800">
+            <div className="p-8 bg-forest-800">
               <div className="grid lg:grid-cols-2 gap-6">
                 {/* Config Panel */}
                 <div className="bg-white/5 rounded-lg p-6">
-                  <h4 className="text-sm font-semibold text-dark-100 mb-4 uppercase tracking-wider">Scenario Config</h4>
+                  <h4 className="text-sm font-semibold text-forest-100 mb-4 uppercase tracking-wider">Scenario Config</h4>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-dark-50">Region</span>
+                      <span className="text-sm text-forest-50">Region</span>
                       <span className="text-sm font-mono bg-white/10 px-2 py-1 rounded">South Asia</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-dark-50">Timeline</span>
+                      <span className="text-sm text-forest-50">Timeline</span>
                       <span className="text-sm font-mono bg-white/10 px-2 py-1 rounded">2025 - 2035</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-dark-50">Actions</span>
+                      <span className="text-sm text-forest-50">Actions</span>
                       <span className="text-sm font-mono bg-white/10 px-2 py-1 rounded">4 selected</span>
                     </div>
                     <div className="h-px bg-white/10" />
-                    <button className="w-full bg-dark-300 text-white py-2 rounded-lg text-sm font-semibold">
+                    <button className="w-full bg-forest-300 text-white py-2 rounded-lg text-sm font-semibold">
                       Run Simulation
                     </button>
                   </div>
                 </div>
                 {/* Results Panel */}
                 <div className="bg-white/5 rounded-lg p-6">
-                  <h4 className="text-sm font-semibold text-dark-100 mb-4 uppercase tracking-wider">Results</h4>
+                  <h4 className="text-sm font-semibold text-forest-100 mb-4 uppercase tracking-wider">Results</h4>
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="bg-climate-green/10 rounded-lg p-3 text-center">
                       <div className="text-xs text-climate-green">Temp Change</div>
@@ -439,18 +439,18 @@ export default function Landing() {
       <section id="tech" className="py-24 px-6 section-alt">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-dark-300 text-sm font-semibold uppercase tracking-wider">Technology</span>
+            <span className="text-forest-300 text-sm font-semibold uppercase tracking-wider">Technology</span>
             <h2 className="font-display text-3xl md:text-5xl font-bold mt-4 mb-6">
               Built with <span className="text-gradient-green">Modern Stack</span>
             </h2>
-            <p className="text-dark-50 text-lg max-w-2xl mx-auto">
+            <p className="text-forest-50 text-lg max-w-2xl mx-auto">
               Leveraging cutting-edge ML frameworks and production-grade infrastructure.
             </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {TECH_STACK.map((tech) => (
               <div key={tech.name} className="glass p-6 text-center hover:bg-white/10 transition-all duration-300 group">
-                <tech.icon className="h-8 w-8 text-dark-300 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+                <tech.icon className="h-8 w-8 text-forest-300 mx-auto mb-3 group-hover:scale-110 transition-transform" />
                 <span className="text-sm font-semibold">{tech.name}</span>
               </div>
             ))}
@@ -462,13 +462,13 @@ export default function Landing() {
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="glass p-12 md:p-16 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-dark-300/10 via-transparent to-dark-300/10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-forest-300/10 via-transparent to-forest-300/10" />
             <div className="relative z-10">
-              <RocketLaunchIcon className="h-12 w-12 text-dark-300 mx-auto mb-6" />
+              <RocketLaunchIcon className="h-12 w-12 text-forest-300 mx-auto mb-6" />
               <h2 className="font-display text-3xl md:text-5xl font-bold mb-6">
                 Ready to Shape the Future?
               </h2>
-              <p className="text-dark-50 text-lg mb-8 max-w-2xl mx-auto">
+              <p className="text-forest-50 text-lg mb-8 max-w-2xl mx-auto">
                 Join researchers, policymakers, and citizens who are using ClimateTwin AI
                 to make informed decisions about our planet's future.
               </p>
@@ -497,17 +497,17 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-dark-300 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-forest-300 flex items-center justify-center">
                 <GlobeAltIcon className="h-5 w-5 text-white" />
               </div>
               <span className="font-display font-bold">ClimateTwin AI</span>
             </div>
-            <div className="flex items-center gap-6 text-sm text-dark-100">
+            <div className="flex items-center gap-6 text-sm text-forest-100">
               <a href="#features" className="hover:text-white transition-colors">Features</a>
               <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
               <a href="#tech" className="hover:text-white transition-colors">Tech</a>
             </div>
-            <div className="text-sm text-dark-100">
+            <div className="text-sm text-forest-100">
               Open Source Climate Intelligence
             </div>
           </div>

@@ -350,12 +350,12 @@ export default function Compare() {
   }, [scenarioProjections, selectedScenarios]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 animate-fade-in">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* ── Hero Header ──────────────────────────────────── */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-climate-green/10 rounded-full text-climate-green text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full text-primary-600 text-sm font-medium mb-4">
             <ChartBarIcon className="h-4 w-4" />
             Climate Scenario Comparison
           </div>
@@ -371,7 +371,7 @@ export default function Compare() {
         {/* ── Scenario Selector ────────────────────────────── */}
         <div className="mb-10">
           <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <SparklesIcon className="h-5 w-5 text-climate-green" />
+            <SparklesIcon className="h-5 w-5 text-primary-600" />
             Select Scenarios to Compare
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -385,13 +385,13 @@ export default function Compare() {
                   onClick={() => toggleScenario(scenario.id)}
                   className={`relative p-5 rounded-2xl border-2 text-left transition-all duration-300 ${
                     isSelected
-                      ? 'border-climate-green bg-climate-green/5 shadow-lg scale-[1.02]'
-                      : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
+                      ? 'border-primary-400 bg-primary-600/5 shadow-lg scale-[1.02]'
+                      : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-card-hover hover:-translate-y-0.5'
                   }`}
                 >
                   {isSelected && (
                     <div className="absolute top-3 right-3">
-                      <CheckCircleIcon className="h-6 w-6 text-climate-green" />
+                      <CheckCircleIcon className="h-6 w-6 text-primary-600" />
                     </div>
                   )}
                   <div
@@ -425,7 +425,7 @@ export default function Compare() {
 
         {/* ── Custom Scenario Sliders ──────────────────────── */}
         {selectedScenarios.includes('custom') && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-10">
+          <div className="bg-white rounded-2xl shadow-card p-6 mb-10">
             <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
               <BoltIcon className="h-5 w-5 text-violet-500" />
               Customize Your Scenario
@@ -483,7 +483,7 @@ export default function Compare() {
               return (
                 <div
                   key={id}
-                  className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+                  className="bg-white rounded-2xl shadow-card overflow-hidden"
                 >
                   {/* Header */}
                   <div
@@ -552,7 +552,7 @@ export default function Compare() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
 
           {/* Temperature Comparison */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="bg-white rounded-2xl shadow-card p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
               <span className="text-2xl">🌡️</span>
               Temperature Comparison
@@ -580,7 +580,7 @@ export default function Compare() {
           </div>
 
           {/* CO2 Comparison */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="bg-white rounded-2xl shadow-card p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
               <span className="text-2xl">☁️</span>
               CO₂ Level Comparison
@@ -616,7 +616,7 @@ export default function Compare() {
           </div>
 
           {/* Forest Cover Comparison */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="bg-white rounded-2xl shadow-card p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
               <span className="text-2xl">🌲</span>
               Forest Cover Comparison
@@ -652,7 +652,7 @@ export default function Compare() {
           </div>
 
           {/* Heatwave Comparison */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="bg-white rounded-2xl shadow-card p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
               <span className="text-2xl">🔥</span>
               Heatwave Days Comparison
@@ -679,7 +679,7 @@ export default function Compare() {
         </div>
 
         {/* ── Radar Chart ──────────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-10">
+        <div className="bg-white rounded-2xl shadow-card p-6 mb-10">
           <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
             <span className="text-2xl">🎯</span>
             Climate Health Overview
@@ -709,10 +709,10 @@ export default function Compare() {
         </div>
 
         {/* ── Detailed Comparison Table ────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-10">
+        <div className="bg-white rounded-2xl shadow-card overflow-hidden mb-10">
           <div className="p-6 border-b border-gray-100">
             <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-              <ChartBarIcon className="h-5 w-5 text-climate-green" />
+              <ChartBarIcon className="h-5 w-5 text-primary-600" />
               Detailed Metrics Comparison (2034)
             </h3>
           </div>
@@ -788,9 +788,9 @@ export default function Compare() {
         </div>
 
         {/* ── Key Insights ─────────────────────────────────── */}
-        <div className="bg-gradient-to-br from-climate-green/5 to-emerald-50/50 rounded-2xl border border-climate-green/20 p-8 mb-10">
+        <div className="bg-gradient-to-br from-primary-500/5 to-emerald-50/50 rounded-2xl border border-primary-400/20 p-8 mb-10">
           <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-            <SparklesIcon className="h-6 w-6 text-climate-green" />
+            <SparklesIcon className="h-6 w-6 text-primary-600" />
             Key Insights
           </h3>
           <div className="grid md:grid-cols-3 gap-6">
@@ -799,7 +799,7 @@ export default function Compare() {
               <h4 className="font-bold text-gray-800 mb-2">Temperature Impact</h4>
               <p className="text-sm text-gray-600">
                 Strong action can reduce temperature increase by up to{' '}
-                <span className="font-bold text-climate-green">0.15°C</span> compared to no action.
+                <span className="font-bold text-primary-600">0.15°C</span> compared to no action.
               </p>
             </div>
             <div className="bg-white rounded-xl p-5 shadow-sm">
@@ -807,7 +807,7 @@ export default function Compare() {
               <h4 className="font-bold text-gray-800 mb-2">Forest Recovery</h4>
               <p className="text-sm text-gray-600">
                 Aggressive reforestation can increase forest cover by{' '}
-                <span className="font-bold text-climate-green">+5%</span> over the decade.
+                <span className="font-bold text-primary-600">+5%</span> over the decade.
               </p>
             </div>
             <div className="bg-white rounded-xl p-5 shadow-sm">
@@ -815,7 +815,7 @@ export default function Compare() {
               <h4 className="font-bold text-gray-800 mb-2">CO₂ Reduction</h4>
               <p className="text-sm text-gray-600">
                 Strong measures can reduce CO₂ levels by{' '}
-                <span className="font-bold text-climate-green">40+ ppm</span> compared to baseline.
+                <span className="font-bold text-primary-600">40+ ppm</span> compared to baseline.
               </p>
             </div>
           </div>
@@ -826,7 +826,7 @@ export default function Compare() {
           <div className="inline-flex flex-col sm:flex-row items-center gap-4">
             <Link
               to="/scenario/new"
-              className="px-8 py-4 bg-gradient-to-r from-climate-green to-emerald-600 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:scale-105"
+              className="px-8 py-4 bg-gradient-to-r from-primary-500 to-emerald-600 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:scale-105"
             >
               Create Your Own Scenario
             </Link>

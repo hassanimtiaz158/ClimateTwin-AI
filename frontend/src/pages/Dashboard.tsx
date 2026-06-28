@@ -168,7 +168,7 @@ function ChartCard({
   className?: string;
 }) {
   return (
-    <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow ${className}`}>
+    <div className={`bg-white rounded-2xl shadow-card hover:shadow-card-hover transition-shadow ${className}`}>
       <div className="p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>
         {children}
@@ -221,10 +221,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center">
-        <div className="relative">
-          <div className="w-16 h-16 border-4 border-climate-green/20 rounded-full animate-spin" />
-          <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-climate-green rounded-full animate-spin" />
-        </div>
+        <div className="spinner w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
         <p className="mt-6 text-gray-600 font-medium">Loading simulation results...</p>
         <p className="mt-2 text-gray-400 text-sm">Analyzing climate projections</p>
       </div>
@@ -235,7 +232,7 @@ export default function Dashboard() {
   if (error || !results) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center">
-        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
           <ExclamationTriangleIcon className="h-8 w-8 text-red-500" />
         </div>
         <h2 className="text-xl font-semibold text-gray-800 mb-2">Something went wrong</h2>
@@ -243,16 +240,16 @@ export default function Dashboard() {
         <div className="flex items-center gap-3">
           <button
             onClick={fetchResults}
-            className="flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors text-sm font-medium"
+            className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors text-sm"
           >
             <ArrowPathIcon className="h-4 w-4" />
-            Try Again
+            Retry
           </button>
           <Link
             to="/scenario/new"
-            className="px-5 py-2.5 bg-climate-green text-white rounded-xl font-medium hover:bg-climate-green/90 transition-colors text-sm"
+            className="px-5 py-2.5 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors text-sm font-medium"
           >
-            Create New Scenario
+            New Scenario
           </Link>
         </div>
       </div>
@@ -294,7 +291,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
+    <div className="min-h-screen bg-gray-50/50 animate-fade-in">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* ── Header ────────────────────────────────────────── */}
@@ -302,8 +299,8 @@ export default function Dashboard() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-climate-green/10 rounded-xl">
-                  <ChartBarIcon className="h-6 w-6 text-climate-green" />
+                <div className="p-2 bg-primary-50 rounded-xl">
+                  <ChartBarIcon className="h-6 w-6 text-primary-600" />
                 </div>
                 <h1 className="text-3xl font-bold text-gray-900">Climate Dashboard</h1>
               </div>
@@ -321,7 +318,7 @@ export default function Dashboard() {
               </Link>
               <Link
                 to={`/recommendations/${runId}`}
-                className="px-5 py-2 bg-climate-green text-white rounded-xl hover:bg-climate-green/90 transition-colors text-sm font-medium shadow-sm"
+                className="px-5 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors text-sm font-medium shadow-sm"
               >
                 <SparklesIcon className="h-4 w-4 inline mr-1" />
                 AI Insights
@@ -332,7 +329,7 @@ export default function Dashboard() {
         </div>
 
         {/* ── Impact Score Banner ───────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-8">
+        <div className="bg-white rounded-2xl shadow-card p-6 mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex items-center gap-6">
               <div className="relative">
@@ -397,7 +394,7 @@ export default function Dashboard() {
         </div>
 
         {/* ── Metric Cards Grid ─────────────────────────────── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 stagger-children">
           {METRIC_CONFIG.map((config) => {
             const value = metrics[config.key];
             const isGood =
@@ -411,7 +408,7 @@ export default function Dashboard() {
             return (
               <div
                 key={config.key}
-                className={`bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all p-5 group`}
+                className={`bg-white rounded-2xl shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all p-5 group`}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className={`p-2.5 rounded-xl bg-gradient-to-br ${config.color} text-white shadow-sm`}>
@@ -652,10 +649,10 @@ export default function Dashboard() {
 
         {/* ── AI Recommendations ────────────────────────────── */}
         {results.recommendations && results.recommendations.length > 0 && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-8">
+        <div className="bg-white rounded-2xl shadow-card p-6 mb-8">
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-climate-green/10 rounded-xl">
-                <SparklesIcon className="h-5 w-5 text-climate-green" />
+              <div className="p-2 bg-primary-50 rounded-xl">
+                <SparklesIcon className="h-5 w-5 text-primary-600" />
               </div>
               <h2 className="text-xl font-semibold text-gray-800">AI Recommendations</h2>
             </div>
@@ -668,7 +665,7 @@ export default function Dashboard() {
                       ? 'border-red-500 bg-red-50/50'
                       : rec.priority === 'medium'
                       ? 'border-amber-500 bg-amber-50/50'
-                      : 'border-green-500 bg-green-50/50'
+                      : 'border-primary-400 bg-primary-50/50'
                   }`}
                 >
                   <div className="flex items-start justify-between mb-2">
@@ -678,7 +675,7 @@ export default function Dashboard() {
                           ? 'bg-red-100 text-red-700'
                           : rec.priority === 'medium'
                           ? 'bg-amber-100 text-amber-700'
-                          : 'bg-green-100 text-green-700'
+                          : 'bg-primary-100 text-primary-700'
                       }`}
                     >
                       {rec.priority}
@@ -695,7 +692,7 @@ export default function Dashboard() {
             <div className="mt-6 text-center">
               <Link
                 to={`/recommendations/${runId}`}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-climate-green text-white rounded-xl font-medium hover:bg-climate-green/90 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors"
               >
                 View All Recommendations
                 <ArrowRightIcon className="h-4 w-4" />
@@ -705,7 +702,7 @@ export default function Dashboard() {
         )}
 
         {/* ── Footer Actions ────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white rounded-2xl shadow-card p-6">
           <div className="text-sm text-gray-500">
             Run ID: <span className="font-mono">{runId?.slice(0, 8)}...</span>
           </div>
@@ -718,7 +715,7 @@ export default function Dashboard() {
             </Link>
             <Link
               to={`/recommendations/${runId}`}
-              className="px-5 py-2.5 bg-climate-green text-white rounded-xl hover:bg-climate-green/90 transition-colors text-sm font-medium"
+              className="px-5 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors text-sm font-medium"
             >
               View Full Analysis
             </Link>
