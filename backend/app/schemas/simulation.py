@@ -1,27 +1,43 @@
 """
-Simulation Schemas - Request/response models for simulation runs.
+Simulation Schemas
+──────────────────
+Pydantic models for simulation run operations.
 """
 
+from __future__ import annotations
+
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
-from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
+# ── Request ────────────────────────────────────────────────────
 class SimulationRequest(BaseModel):
-    """Schema for requesting a simulation."""
+    """Payload for triggering a simulation run."""
+
     scenario_id: UUID = Field(..., description="Scenario ID to simulate")
 
 
-class SimulationResponse(BaseModel):
-    """Schema for simulation response."""
-    run_id: UUID
+# ── Read ───────────────────────────────────────────────────────
+class SimulationRunRead(BaseModel):
+    """Full simulation run record."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    scenario_id: UUID
     status: str
-    message: str = "Simulation started successfully"
+    error_message: Optional[str] = None
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    created_at: datetime
 
 
-class SimulationStatus(BaseModel):
-    """Schema for simulation status."""
+class SimulationRunSummary(BaseModel):
+    """Lightweight run representation for history lists."""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
@@ -29,4 +45,17 @@ class SimulationStatus(BaseModel):
     status: str
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
-    error_message: Optional[str] = None
+    created_at: datetime
+
+
+# ── Response ───────────────────────────────────────────────────
+class SimulationResponse(BaseModel):
+    """Response after starting a simulation."""
+
+    run_id: UUID
+    status: str
+    message: str = "Simulation started successfully"
+
+
+# ── Backward-compatible aliases ────────────────────────────────
+SimulationStatus = SimulationRunSummary

@@ -1,37 +1,53 @@
 """
-ProjectionResult Model - Stores individual projection data points.
+ProjectionResult Model
+──────────────────────
+Stores the raw output of the projection engine — one row per year × indicator.
 """
 
-import uuid
-from datetime import datetime
+from __future__ import annotations
 
-from sqlalchemy import Column, String, DateTime, Integer, Float, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship
+import uuid
+from datetime import datetime, timezone
+from typing import Optional
+
+from sqlalchemy import DateTime, Float, ForeignKey, Index, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+from app.types import GUID
 
 
 class ProjectionResult(Base):
+    """A single projection data point (year + indicator)."""
+
     __tablename__ = "projection_results"
-
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    simulation_run_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("simulation_runs.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
+    __table_args__ = (
+        Index("ix_proj_run_id", "simulation_run_id"),
+        Index("ix_proj_year", "year"),
+        Index("ix_proj_indicator", "indicator"),
     )
-    year = Column(Integer, nullable=False)
-    indicator = Column(String(100), nullable=False)
-    value = Column(Float, nullable=False)
-    confidence_low = Column(Float, nullable=True)
-    confidence_high = Column(Float, nullable=True)
-    baseline_value = Column(Float, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
-    # Relationships
-    simulation_run = relationship("SimulationRun", back_populates="projections", lazy="selectin")
+    # ── Columns ───────────────────────────────────────────────
+    id: Mapped[uuid.UUID] = mapped_column(
+        GUID(), primary_key=True, default=uuid.uuid4
+    )
+    simulation_run_id: Mapped[uuid.UUID] = mapped_column(
+        GUID(), ForeignKey("simulation_runs.id", ondelete="CASCADE"), nullable=False
+    )
+    year: Mapped[int] = mapped_column(Integer, nullable=False)
+    indicator: Mapped[str] = mapped_column(String(100), nullable=False)
+    value: Mapped[float] = mapped_column(Float, nullable=False)
+    confidence_low: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    confidence_high: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    baseline_value: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+
+    # ── Relationships ─────────────────────────────────────────
+    simulation_run: Mapped["SimulationRun"] = relationship(  # noqa: F821
+        "SimulationRun", back_populates="projections", lazy="selectin"
+    )
 
     def __repr__(self) -> str:
         return f"<Projection {self.year}: {self.indicator}={self.value}>"

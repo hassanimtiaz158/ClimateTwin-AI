@@ -1,28 +1,47 @@
 """
-Dataset Model - Metadata for uploaded climate datasets.
+Dataset Model
+─────────────
+Metadata for uploaded climate datasets (CSV / Parquet / JSON).
 """
 
-import uuid
-from datetime import datetime
+from __future__ import annotations
 
-from sqlalchemy import Column, String, DateTime, Integer, JSON
-from sqlalchemy.dialects.postgresql import UUID
+import uuid
+from datetime import datetime, timezone
+from typing import Optional
+
+from sqlalchemy import DateTime, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
+from app.types import GUID, JSONColumn
 
 
 class Dataset(Base):
+    """An uploaded climate dataset."""
+
     __tablename__ = "datasets"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    name = Column(String(255), nullable=False)
-    source = Column(String(255), nullable=True)
-    region = Column(String(100), nullable=False, default="Global")
-    date_range = Column(JSON, nullable=True)
-    file_path = Column(String(500), nullable=True)
-    record_count = Column(Integer, default=0)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    # ── Columns ───────────────────────────────────────────────
+    id: Mapped[uuid.UUID] = mapped_column(
+        GUID(), primary_key=True, default=uuid.uuid4
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    source: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    region: Mapped[str] = mapped_column(String(100), nullable=False, default="Global")
+    date_range: Mapped[Optional[dict]] = mapped_column(
+        JSONColumn(default=None), nullable=True
+    )
+    file_path: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    record_count: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
 
     def __repr__(self) -> str:
-        return f"<Dataset {self.name} ({self.region})>"
+        return f"<Dataset {self.name!r} ({self.region})>"
