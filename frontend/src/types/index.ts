@@ -76,6 +76,18 @@ export interface SimulationResults {
   scenario_id: string;
   status: string;
   message: string;
+  // Action sliders
+  reforestation_slider: number;
+  renewable_energy_slider: number;
+  ev_adoption_slider: number;
+  emission_reduction_slider: number;
+  public_transit_slider: number;
+  water_conservation_slider: number;
+  // Scenario info
+  city: string;
+  country: string;
+  target_year: number;
+  // Projections & metrics
   projections: ProjectionDataPoint[];
   metrics: SimulationMetrics;
   chart_data: Record<string, ChartDataPoint[]>;

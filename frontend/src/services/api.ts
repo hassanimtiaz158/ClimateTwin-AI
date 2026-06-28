@@ -7,7 +7,7 @@ import type {
   PaginatedHistory,
 } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9000/api';
 
 // ── API Error class ──────────────────────────────────────────
 export class ApiError extends Error {
@@ -41,7 +41,7 @@ client.interceptors.response.use(
 
     // Friendly messages for common scenarios
     if (status === 0) {
-      return Promise.reject(new ApiError(0, 'Cannot connect to server. Is the backend running on localhost:8000?'));
+      return Promise.reject(new ApiError(0, `Cannot connect to server at ${API_BASE_URL}. Is the backend running?`));
     }
     if (status === 404) {
       return Promise.reject(new ApiError(404, 'Resource not found. It may have been deleted.'));

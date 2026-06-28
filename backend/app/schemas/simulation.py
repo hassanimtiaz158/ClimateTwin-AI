@@ -100,6 +100,19 @@ class SimulationResultResponse(BaseModel):
     status: str
     message: str
 
+    # ── Action sliders ───────────────────────────────────────
+    reforestation_slider: float = 0.0
+    renewable_energy_slider: float = 0.0
+    ev_adoption_slider: float = 0.0
+    emission_reduction_slider: float = 0.0
+    public_transit_slider: float = 0.0
+    water_conservation_slider: float = 0.0
+
+    # ── Scenario info ────────────────────────────────────────
+    city: str = ""
+    country: str = ""
+    target_year: int = 2035
+
     # ── Projections (8 indicators × years) ────────────────────
     projections: List[Dict[str, Any]]
 

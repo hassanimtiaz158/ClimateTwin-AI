@@ -37,6 +37,16 @@ import { calculateImpactScore } from '../utils';
 import { useStore } from '../store/useStore';
 import type { SimulationResults } from '../types';
 
+// ── Action Definitions ──────────────────────────────────────────
+const ACTION_CONFIG = [
+  { key: 'reforestation_slider' as const, label: 'Tree Planting & Reforestation', shortLabel: 'Reforestation', color: 'from-emerald-400 to-green-500', bgColor: 'bg-emerald-50', icon: '🌳' },
+  { key: 'renewable_energy_slider' as const, label: 'Renewable Energy Adoption', shortLabel: 'Renewables', color: 'from-amber-400 to-yellow-500', bgColor: 'bg-amber-50', icon: '⚡' },
+  { key: 'ev_adoption_slider' as const, label: 'Electric Vehicle Adoption', shortLabel: 'EV Adoption', color: 'from-blue-400 to-indigo-500', bgColor: 'bg-blue-50', icon: '🚗' },
+  { key: 'emission_reduction_slider' as const, label: 'Industrial Emission Reduction', shortLabel: 'Emission Cut', color: 'from-purple-400 to-violet-500', bgColor: 'bg-purple-50', icon: '🏭' },
+  { key: 'public_transit_slider' as const, label: 'Public Transport Improvement', shortLabel: 'Public Transit', color: 'from-cyan-400 to-teal-500', bgColor: 'bg-cyan-50', icon: '🚇' },
+  { key: 'water_conservation_slider' as const, label: 'Water Conservation', shortLabel: 'Water', color: 'from-sky-400 to-blue-500', bgColor: 'bg-sky-50', icon: '💧' },
+];
+
 // ── Metric Card Configuration ─────────────────────────────────
 const METRIC_CONFIG = [
   {
@@ -379,6 +389,64 @@ export default function Dashboard() {
                 <div className="text-xs text-gray-500 mt-1">Forest Cover</div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* ── Action Score Bars ──────────────────────────────── */}
+        <div className="bg-white rounded-2xl shadow-card p-6 mb-8">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="p-2 bg-primary-50 rounded-xl">
+              <SparklesIcon className="h-5 w-5 text-primary-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-800">Climate Actions Applied</h2>
+              <p className="text-sm text-gray-500">{results.city && results.country ? `${results.city}, ${results.country}` : 'Global'} · Target: {results.target_year}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {ACTION_CONFIG.map((action) => {
+              const value = results[action.key];
+              const percentage = Math.round(value * 100);
+              const isActive = value > 0;
+              return (
+                <div
+                  key={action.key}
+                  className={`relative rounded-xl border p-4 transition-all duration-300 ${
+                    isActive
+                      ? 'border-gray-200 shadow-sm hover:shadow-md'
+                      : 'border-gray-100 opacity-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-lg">{action.icon}</span>
+                    <span className="text-sm font-semibold text-gray-700 truncate">{action.shortLabel}</span>
+                  </div>
+                  <div className="relative h-4 bg-gray-100 rounded-full overflow-hidden mb-2">
+                    <div
+                      className={`h-full bg-gradient-to-r ${action.color} rounded-full transition-all duration-700 ease-out`}
+                      style={{ width: `${percentage}%` }}
+                    />
+                    {percentage > 0 && (
+                      <div
+                        className="absolute inset-0 rounded-full opacity-30"
+                        style={{
+                          background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)`,
+                          animation: 'shimmer 2s infinite',
+                        }}
+                      />
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-400">{action.label}</span>
+                    <span className={`text-sm font-bold ${
+                      percentage >= 70 ? 'text-green-600' : percentage >= 40 ? 'text-amber-600' : 'text-gray-400'
+                    }`}>
+                      {percentage}%
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
