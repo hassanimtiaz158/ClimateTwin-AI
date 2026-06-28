@@ -35,16 +35,6 @@ export interface Scenario {
   updated_at: string;
 }
 
-export interface SimulationRun {
-  id: string;
-  scenario_id: string;
-  status: 'pending' | 'running' | 'completed' | 'failed';
-  error_message?: string;
-  started_at?: string;
-  completed_at?: string;
-  created_at: string;
-}
-
 export interface ProjectionDataPoint {
   year: number;
   temperature_change: number;
@@ -122,14 +112,5 @@ export interface HistoryItem {
   status: string;
   started_at?: string;
   completed_at?: string;
-  created_at: string;
-}
-
-export interface ClimateDataset {
-  id: string;
-  name: string;
-  source?: string;
-  region: string;
-  record_count: number;
   created_at: string;
 }

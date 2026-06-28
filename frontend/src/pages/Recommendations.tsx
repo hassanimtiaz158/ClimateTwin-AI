@@ -6,7 +6,9 @@ import {
   ArrowPathIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
+  ArrowDownTrayIcon,
 } from '@heroicons/react/24/outline';
+import toast from 'react-hot-toast';
 import { api, ApiError } from '../services/api';
 import type { Recommendations as RecommendationsType } from '../types';
 
@@ -109,19 +111,51 @@ export default function Recommendations() {
     );
   }
 
+  const exportRecommendations = () => {
+    if (!recommendations) return;
+    const data = {
+      reportType: 'ClimateTwin AI — AI Recommendations',
+      generatedAt: new Date().toISOString(),
+      runId,
+      summary: recommendations.summary,
+      findings: recommendations.findings,
+      actions: recommendations.actions,
+      confidence: recommendations.confidence,
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `climatetwin-recommendations-${runId?.slice(0, 8) || 'unknown'}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success('Recommendations exported!');
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
-      <div className="flex items-center gap-4">
-        <Link
-          to={`/dashboard/${runId}`}
-          className="text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          <ArrowLeftIcon className="h-6 w-6" />
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">AI Recommendations</h1>
-          <p className="text-gray-500">Based on your scenario analysis</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link
+            to={`/dashboard/${runId}`}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <ArrowLeftIcon className="h-6 w-6" />
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">AI Recommendations</h1>
+            <p className="text-gray-500">Based on your scenario analysis</p>
+          </div>
         </div>
+        <button
+          onClick={exportRecommendations}
+          className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors text-sm font-medium"
+        >
+          <ArrowDownTrayIcon className="h-4 w-4" />
+          Export
+        </button>
       </div>
 
       {/* Executive Summary */}

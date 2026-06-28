@@ -1,16 +1,7 @@
 import type { SimulationResults } from '../types';
-import { calculateImpactScore } from '../utils';
+import { calculateImpactScore, escapeHtml } from '../utils';
 
 // ── Helpers ──────────────────────────────────────────────────
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);

@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useCallback, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
   MapPinIcon,
@@ -154,8 +154,10 @@ interface ValidationErrors {
 
 export default function ScenarioBuilder() {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const { cacheResults } = useStore();
   const [loading, setLoading] = useState(false);
+  const [loadingScenario, setLoadingScenario] = useState(!!id);
   const [step, setStep] = useState(1); // 1: Location, 2: Actions, 3: Review
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -173,6 +175,36 @@ export default function ScenarioBuilder() {
     waterConservationSlider: 0.0,
     notes: '',
   });
+
+  // Load existing scenario when :id is present
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const scenario = await api.getScenario(id);
+        if (cancelled) return;
+        setConfig({
+          name: scenario.name,
+          city: scenario.city,
+          country: scenario.country,
+          targetYear: scenario.target_year,
+          reforestationSlider: scenario.reforestation_slider,
+          renewableEnergySlider: scenario.renewable_energy_slider,
+          evAdoptionSlider: scenario.ev_adoption_slider,
+          emissionReductionSlider: scenario.emission_reduction_slider,
+          publicTransitSlider: scenario.public_transit_slider,
+          waterConservationSlider: scenario.water_conservation_slider,
+          notes: scenario.notes || '',
+        });
+      } catch {
+        if (!cancelled) toast.error('Failed to load scenario');
+      } finally {
+        if (!cancelled) setLoadingScenario(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [id]);
 
   // ── Validation ──────────────────────────────────────────
   const validate = useCallback((): ValidationErrors => {
@@ -311,7 +343,16 @@ export default function ScenarioBuilder() {
     setLoading(true);
 
     try {
-      const result = await api.runInlineSimulation(config);
+      let result;
+
+      if (id) {
+        // Editing existing scenario: update it, then run simulation
+        await api.updateScenario(id, config);
+        result = await api.runSimulation(id);
+      } else {
+        // New scenario: run inline simulation
+        result = await api.runInlineSimulation(config);
+      }
 
       // Cache results so Dashboard doesn't need to re-fetch immediately
       cacheResults(result.run_id, result);
@@ -714,18 +755,32 @@ export default function ScenarioBuilder() {
   );
 
   // ── Main Render ──────────────────────────────────────────
+  if (loadingScenario) {
+    return (
+      <div className="max-w-4xl mx-auto flex flex-col items-center justify-center h-64">
+        <div className="relative mb-4">
+          <div className="w-12 h-12 border-4 border-primary-200 rounded-full animate-spin" />
+          <div className="absolute inset-0 w-12 h-12 border-4 border-transparent border-t-primary-500 rounded-full animate-spin" />
+        </div>
+        <p className="text-gray-500 font-medium">Loading scenario...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Create Climate Scenario</h1>
+        <h1 className="text-3xl font-bold text-gray-900">
+          {id ? 'Edit Climate Scenario' : 'Create Climate Scenario'}
+        </h1>
         <p className="text-gray-500 mt-2">
-          Configure your climate simulation in 3 simple steps
+          {id ? 'Modify your scenario and re-run the simulation' : 'Configure your climate simulation in 3 simple steps'}
         </p>
       </div>
 
-      {/* Quick-Start Demo Presets */}
-      {step === 1 && (
+      {/* Quick-Start Demo Presets (only when creating new) */}
+      {!id && step === 1 && (
         <div className="mb-8 animate-slide-up">
           <p className="text-sm text-gray-500 mb-3 text-center">Or start with a one-click demo:</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
