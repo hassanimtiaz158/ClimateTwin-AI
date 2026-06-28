@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import type {
   ScenarioConfig,
   Scenario,
@@ -9,25 +9,59 @@ import type {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
+// ── API Error class ──────────────────────────────────────────
+export class ApiError extends Error {
+  status: number;
+  detail: string;
+
+  constructor(status: number, detail: string) {
+    super(detail);
+    this.name = 'ApiError';
+    this.status = status;
+    this.detail = detail;
+  }
+}
+
+// ── Axios client ─────────────────────────────────────────────
 const client = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 30000,
 });
 
+// Response interceptor: unwrap data + normalize errors
 client.interceptors.response.use(
   (response) => response.data,
-  (error) => {
-    console.error('API Error:', error.response?.data || error.message);
-    return Promise.reject(error);
+  (error: AxiosError<{ detail?: string }>) => {
+    const status = error.response?.status ?? 0;
+    const detail =
+      error.response?.data?.detail ??
+      error.message ??
+      'Unknown error';
+
+    // Friendly messages for common scenarios
+    if (status === 0) {
+      return Promise.reject(new ApiError(0, 'Cannot connect to server. Is the backend running on localhost:8000?'));
+    }
+    if (status === 404) {
+      return Promise.reject(new ApiError(404, 'Resource not found. It may have been deleted.'));
+    }
+    if (status === 422) {
+      return Promise.reject(new ApiError(422, 'Invalid request. Please check your inputs.'));
+    }
+    if (status >= 500) {
+      return Promise.reject(new ApiError(status, 'Server error. Please try again later.'));
+    }
+
+    return Promise.reject(new ApiError(status, detail));
   }
 );
 
+// ── Typed API methods ────────────────────────────────────────
 export const api = {
-  // Scenarios
+  // ── Scenarios ────────────────────────────────────────────────
   async createScenario(config: ScenarioConfig): Promise<Scenario> {
-    const response = await client.post('/scenarios', {
+    return client.post('/scenarios', {
       name: config.name,
       city: config.city,
       country: config.country,
@@ -39,18 +73,15 @@ export const api = {
       public_transit_slider: config.publicTransitSlider,
       water_conservation_slider: config.waterConservationSlider,
       notes: config.notes,
-    });
-    return response as unknown as Scenario;
+    }) as Promise<Scenario>;
   },
 
   async getScenario(id: string): Promise<Scenario> {
-    const response = await client.get(`/scenarios/${id}`);
-    return response as unknown as Scenario;
+    return client.get(`/scenarios/${id}`) as Promise<Scenario>;
   },
 
   async listScenarios(): Promise<Scenario[]> {
-    const response = await client.get('/scenarios');
-    return response as unknown as Scenario[];
+    return client.get('/scenarios') as Promise<Scenario[]>;
   },
 
   async updateScenario(id: string, data: Partial<ScenarioConfig>): Promise<Scenario> {
@@ -67,22 +98,20 @@ export const api = {
     if (data.waterConservationSlider !== undefined) updateData.water_conservation_slider = data.waterConservationSlider;
     if (data.notes !== undefined) updateData.notes = data.notes;
 
-    const response = await client.patch(`/scenarios/${id}`, updateData);
-    return response as unknown as Scenario;
+    return client.patch(`/scenarios/${id}`, updateData) as Promise<Scenario>;
   },
 
   async deleteScenario(id: string): Promise<void> {
     await client.delete(`/scenarios/${id}`);
   },
 
-  // Simulations
+  // ── Simulations ──────────────────────────────────────────────
   async runSimulation(scenarioId: string): Promise<SimulationResults> {
-    const response = await client.post('/simulate', { scenario_id: scenarioId });
-    return response as unknown as SimulationResults;
+    return client.post('/simulate', { scenario_id: scenarioId }) as Promise<SimulationResults>;
   },
 
   async runInlineSimulation(config: ScenarioConfig): Promise<SimulationResults> {
-    const response = await client.post('/simulate', {
+    return client.post('/simulate', {
       city: config.city,
       country: config.country,
       target_year: config.targetYear,
@@ -92,36 +121,32 @@ export const api = {
       emission_reduction_slider: config.emissionReductionSlider,
       public_transit_slider: config.publicTransitSlider,
       water_conservation_slider: config.waterConservationSlider,
-    });
-    return response as unknown as SimulationResults;
+    }) as Promise<SimulationResults>;
   },
 
   async getResults(runId: string): Promise<SimulationResults> {
-    const response = await client.get(`/results/${runId}`);
-    return response as unknown as SimulationResults;
+    return client.get(`/results/${runId}`) as Promise<SimulationResults>;
   },
 
+  // ── History ──────────────────────────────────────────────────
   async getHistory(): Promise<HistoryItem[]> {
-    const response = await client.get('/history');
-    return response as unknown as HistoryItem[];
+    return client.get('/history') as Promise<HistoryItem[]>;
   },
 
-  // Recommendations
+  // ── Recommendations ──────────────────────────────────────────
   async getRecommendations(runId: string): Promise<Recommendations> {
-    const response = await client.get(`/recommendations/${runId}`);
-    return response as unknown as Recommendations;
+    return client.get(`/recommendations/${runId}`) as Promise<Recommendations>;
   },
 
-  // Datasets
+  // ── Datasets ─────────────────────────────────────────────────
   async uploadDataset(file: File, metadata: Record<string, string>): Promise<{ id: string }> {
     const formData = new FormData();
     formData.append('file', file);
     Object.entries(metadata).forEach(([key, value]) => {
       formData.append(key, value);
     });
-    const response = await client.post('/datasets/upload', formData, {
+    return client.post('/datasets/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    return response as unknown as { id: string };
+    }) as Promise<{ id: string }>;
   },
 };

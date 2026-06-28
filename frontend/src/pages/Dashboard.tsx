@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   LineChart,
@@ -31,7 +31,8 @@ import {
   ChartBarIcon,
   SparklesIcon,
 } from '@heroicons/react/24/outline';
-import { api } from '../services/api';
+import { api, ApiError } from '../services/api';
+import { useStore } from '../store/useStore';
 import type { SimulationResults } from '../types';
 
 // ── Metric Card Configuration ─────────────────────────────────
@@ -179,26 +180,42 @@ function ChartCard({
 // ── Main Dashboard Component ──────────────────────────────────
 export default function Dashboard() {
   const { runId } = useParams<{ runId: string }>();
+  const { getCachedResults, cacheResults } = useStore();
   const [results, setResults] = useState<SimulationResults | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchResults = async () => {
-      if (!runId) return;
-      try {
-        const data = await api.getResults(runId);
-        setResults(data);
-      } catch (err) {
-        setError('Failed to load simulation results');
-        console.error('Failed to fetch results:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchResults = useCallback(async () => {
+    if (!runId) return;
 
+    // Check cache first
+    const cached = getCachedResults(runId);
+    if (cached) {
+      setResults(cached);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const data = await api.getResults(runId);
+      cacheResults(runId, data);
+      setResults(data);
+    } catch (err) {
+      const msg = err instanceof ApiError
+        ? err.detail
+        : 'Failed to load simulation results';
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  }, [runId, getCachedResults, cacheResults]);
+
+  useEffect(() => {
     fetchResults();
-  }, [runId]);
+  }, [fetchResults]);
 
   // ── Loading State ──────────────────────────────────────────
   if (loading) {
@@ -222,13 +239,22 @@ export default function Dashboard() {
           <ExclamationTriangleIcon className="h-8 w-8 text-red-500" />
         </div>
         <h2 className="text-xl font-semibold text-gray-800 mb-2">Something went wrong</h2>
-        <p className="text-gray-500 mb-6">{error || 'No results found'}</p>
-        <Link
-          to="/scenario/new"
-          className="px-6 py-3 bg-climate-green text-white rounded-xl font-medium hover:bg-climate-green/90 transition-colors"
-        >
-          Create New Scenario
-        </Link>
+        <p className="text-gray-500 mb-6 max-w-md text-center">{error || 'No results found'}</p>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={fetchResults}
+            className="flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors text-sm font-medium"
+          >
+            <ArrowPathIcon className="h-4 w-4" />
+            Try Again
+          </button>
+          <Link
+            to="/scenario/new"
+            className="px-5 py-2.5 bg-climate-green text-white rounded-xl font-medium hover:bg-climate-green/90 transition-colors text-sm"
+          >
+            Create New Scenario
+          </Link>
+        </div>
       </div>
     );
   }

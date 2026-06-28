@@ -7,13 +7,21 @@ interface AppState {
   setCurrentScenario: (scenario: Partial<ScenarioConfig>) => void;
   resetCurrentScenario: () => void;
 
-  // Current simulation results
-  currentResults: SimulationResults | null;
-  setCurrentResults: (results: SimulationResults | null) => void;
+  // Simulation results cache (keyed by runId)
+  resultsCache: Record<string, SimulationResults>;
+  cacheResults: (runId: string, results: SimulationResults) => void;
+  getCachedResults: (runId: string) => SimulationResults | null;
+  clearResultsCache: () => void;
 
   // UI State
   sidebarOpen: boolean;
   toggleSidebar: () => void;
+
+  // Simulation status
+  isSimulating: boolean;
+  setSimulating: (v: boolean) => void;
+  simulationError: string | null;
+  setSimulationError: (msg: string | null) => void;
 }
 
 const initialScenario: Partial<ScenarioConfig> = {
@@ -29,7 +37,7 @@ const initialScenario: Partial<ScenarioConfig> = {
   waterConservationSlider: 0.0,
 };
 
-export const useStore = create<AppState>((set) => ({
+export const useStore = create<AppState>((set, get) => ({
   currentScenario: initialScenario,
   setCurrentScenario: (scenario) =>
     set((state) => ({
@@ -37,9 +45,19 @@ export const useStore = create<AppState>((set) => ({
     })),
   resetCurrentScenario: () => set({ currentScenario: initialScenario }),
 
-  currentResults: null,
-  setCurrentResults: (results) => set({ currentResults: results }),
+  resultsCache: {},
+  cacheResults: (runId, results) =>
+    set((state) => ({
+      resultsCache: { ...state.resultsCache, [runId]: results },
+    })),
+  getCachedResults: (runId) => get().resultsCache[runId] ?? null,
+  clearResultsCache: () => set({ resultsCache: {} }),
 
   sidebarOpen: true,
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+
+  isSimulating: false,
+  setSimulating: (v) => set({ isSimulating: v }),
+  simulationError: null,
+  setSimulationError: (msg) => set({ simulationError: msg }),
 }));

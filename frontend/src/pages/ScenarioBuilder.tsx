@@ -17,7 +17,9 @@ import {
   BeakerIcon,
   InformationCircleIcon,
 } from '@heroicons/react/24/outline';
-import { api } from '../services/api';
+import { api, ApiError } from '../services/api';
+import { useStore } from '../store/useStore';
+import type { ScenarioConfig } from '../types';
 
 // ── Action Definitions ──────────────────────────────────────
 const CLIMATE_ACTIONS = [
@@ -149,22 +151,9 @@ interface ValidationErrors {
   sliders?: string;
 }
 
-interface ScenarioConfig {
-  name: string;
-  city: string;
-  country: string;
-  targetYear: number;
-  reforestationSlider: number;
-  renewableEnergySlider: number;
-  evAdoptionSlider: number;
-  emissionReductionSlider: number;
-  publicTransitSlider: number;
-  waterConservationSlider: number;
-  notes: string;
-}
-
 export default function ScenarioBuilder() {
   const navigate = useNavigate();
+  const { cacheResults, setSimulating, setSimulationError } = useStore();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1); // 1: Location, 2: Actions, 3: Review
   const [errors, setErrors] = useState<ValidationErrors>({});
@@ -319,14 +308,26 @@ export default function ScenarioBuilder() {
     }
 
     setLoading(true);
+    setSimulating(true);
+    setSimulationError(null);
+
     try {
       const result = await api.runInlineSimulation(config);
+
+      // Cache results so Dashboard doesn't need to re-fetch immediately
+      cacheResults(result.run_id, result);
+
       toast.success('Simulation completed successfully!');
       navigate(`/dashboard/${result.run_id}`);
     } catch (error) {
-      toast.error('Failed to run simulation. Please try again.');
+      const msg = error instanceof ApiError
+        ? error.detail
+        : 'Failed to run simulation. Please try again.';
+      setSimulationError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
+      setSimulating(false);
     }
   };
 
