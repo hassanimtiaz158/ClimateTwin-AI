@@ -19,6 +19,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { api, ApiError } from '../services/api';
 import { useStore } from '../store/useStore';
+import { DEMO_SCENARIOS } from '../data/demoScenarios';
 import type { ScenarioConfig } from '../types';
 
 // ── Action Definitions ──────────────────────────────────────
@@ -726,6 +727,31 @@ export default function ScenarioBuilder() {
           Configure your climate simulation in 3 simple steps
         </p>
       </div>
+
+      {/* Quick-Start Demo Presets */}
+      {step === 1 && (
+        <div className="mb-8 animate-slide-up">
+          <p className="text-sm text-gray-500 mb-3 text-center">Or start with a one-click demo:</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {DEMO_SCENARIOS.map((demo) => {
+              const Icon = demo.icon;
+              return (
+                <button
+                  key={demo.id}
+                  onClick={() => setConfig({ ...demo.config })}
+                  className={`p-3 rounded-xl border text-left transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${demo.borderColor} ${demo.bgColor}`}
+                >
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Icon className={`h-4 w-4 ${demo.accentColor}`} />
+                    <span className={`text-xs font-semibold ${demo.accentColor}`}>{demo.name}</span>
+                  </div>
+                  <p className="text-[11px] text-gray-500 leading-snug">{demo.tagline}</p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Step Indicator */}
       <StepIndicator />

@@ -1,4 +1,5 @@
-﻿import { Link } from 'react-router-dom';
+﻿import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   SparklesIcon,
   ChartBarIcon,
@@ -19,6 +20,9 @@ import {
   CodeBracketIcon,
   DevicePhoneMobileIcon,
 } from '@heroicons/react/24/outline';
+import { api, ApiError } from '../services/api';
+import { useStore } from '../store/useStore';
+import { DEMO_SCENARIOS } from '../data/demoScenarios';
 
 const PROBLEMS = [
   {
@@ -115,6 +119,65 @@ const TECH_STACK = [
   { name: 'Recharts', icon: ChartPieIcon },
 ];
 
+// ── Demo Card Component (self-contained with loading state) ──
+function DemoCard({ demo }: { demo: typeof DEMO_SCENARIOS[0] }) {
+  const navigate = useNavigate();
+  const { cacheResults } = useStore();
+  const [loading, setLoading] = useState(false);
+
+  const handleRun = async () => {
+    setLoading(true);
+    try {
+      const result = await api.runInlineSimulation(demo.config);
+      cacheResults(result.run_id, result);
+      navigate(`/dashboard/${result.run_id}`);
+    } catch (err) {
+      const msg = err instanceof ApiError ? err.detail : 'Demo failed. Is the backend running?';
+      alert(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const Icon = demo.icon;
+
+  return (
+    <div className={`glass p-6 flex flex-col hover:bg-white/10 transition-all duration-300 group ${loading ? 'opacity-75' : ''}`}>
+      <div className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${demo.color} text-white shadow-lg mb-5 self-start group-hover:scale-105 transition-transform`}>
+        <Icon className="h-6 w-6" />
+      </div>
+      <h3 className="text-lg font-semibold mb-1">{demo.name}</h3>
+      <p className="text-xs font-medium text-forest-300 mb-3">{demo.tagline}</p>
+      <p className="text-forest-50 text-sm leading-relaxed flex-1 mb-5">{demo.description}</p>
+      <button
+        onClick={handleRun}
+        disabled={loading}
+        className="w-full py-2.5 px-4 rounded-xl text-sm font-semibold
+          bg-forest-300 text-white
+          hover:bg-forest-200
+          disabled:opacity-60 disabled:cursor-not-allowed
+          transition-all duration-200
+          flex items-center justify-center gap-2"
+      >
+        {loading ? (
+          <>
+            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            Running...
+          </>
+        ) : (
+          <>
+            Run Demo
+            <ArrowRightIcon className="h-4 w-4" />
+          </>
+        )}
+      </button>
+    </div>
+  );
+}
+
 export default function Landing() {
   return (
     <div className="min-h-screen bg-forest-700 text-white">
@@ -129,6 +192,7 @@ export default function Landing() {
           </Link>
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm text-forest-50 hover:text-white transition-colors">Features</a>
+            <a href="#demos" className="text-sm text-forest-50 hover:text-white transition-colors">Try Demo</a>
             <a href="#how-it-works" className="text-sm text-forest-50 hover:text-white transition-colors">How It Works</a>
             <a href="#tech" className="text-sm text-forest-50 hover:text-white transition-colors">Tech Stack</a>
           </div>
@@ -161,13 +225,13 @@ export default function Landing() {
             shape the next decade.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/scenario/new" className="btn-cta inline-flex items-center gap-2">
-              Start Simulation
+            <a href="#demos" className="btn-cta inline-flex items-center gap-2">
+              Try a Demo
               <ArrowRightIcon className="h-5 w-5" />
-            </Link>
-            <a href="#features" className="btn-cta-outline inline-flex items-center gap-2">
-              Learn More
             </a>
+            <Link to="/scenario/new" className="btn-cta-outline inline-flex items-center gap-2">
+              Build Custom Scenario
+            </Link>
           </div>
           <div className="mt-16 flex flex-wrap items-center justify-center gap-6 text-sm text-forest-100">
             <div className="flex items-center gap-2">
@@ -366,71 +430,23 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 7. DEMO PREVIEW */}
-      <section className="py-24 px-6">
-        <div className="max-w-6xl mx-auto">
+      {/* 7. TRY IT NOW — One-Click Demos */}
+      <section id="demos" className="py-24 px-6">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-forest-300 text-sm font-semibold uppercase tracking-wider">Demo</span>
+            <span className="text-forest-300 text-sm font-semibold uppercase tracking-wider">Try It Now</span>
             <h2 className="font-display text-3xl md:text-5xl font-bold mt-4 mb-6">
-              See <span className="text-gradient-green">ClimateTwin</span> in Action
+              One-Click <span className="text-gradient-green">Demo Scenarios</span>
             </h2>
+            <p className="text-forest-50 text-lg max-w-2xl mx-auto">
+              Click any scenario below to instantly run a simulation and see real projections.
+              No data entry required.
+            </p>
           </div>
-          <div className="browser-frame">
-            <div className="browser-bar">
-              <div className="browser-dot bg-climate-red" />
-              <div className="browser-dot bg-climate-orange" />
-              <div className="browser-dot bg-climate-green" />
-              <span className="text-xs text-forest-100 ml-2">climatetwin.ai/simulation</span>
-            </div>
-            <div className="p-8 bg-forest-800">
-              <div className="grid lg:grid-cols-2 gap-6">
-                {/* Config Panel */}
-                <div className="bg-white/5 rounded-lg p-6">
-                  <h4 className="text-sm font-semibold text-forest-100 mb-4 uppercase tracking-wider">Scenario Config</h4>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-forest-50">Region</span>
-                      <span className="text-sm font-mono bg-white/10 px-2 py-1 rounded">South Asia</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-forest-50">Timeline</span>
-                      <span className="text-sm font-mono bg-white/10 px-2 py-1 rounded">2025 - 2035</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-forest-50">Actions</span>
-                      <span className="text-sm font-mono bg-white/10 px-2 py-1 rounded">4 selected</span>
-                    </div>
-                    <div className="h-px bg-white/10" />
-                    <button className="w-full bg-forest-300 text-white py-2 rounded-lg text-sm font-semibold">
-                      Run Simulation
-                    </button>
-                  </div>
-                </div>
-                {/* Results Panel */}
-                <div className="bg-white/5 rounded-lg p-6">
-                  <h4 className="text-sm font-semibold text-forest-100 mb-4 uppercase tracking-wider">Results</h4>
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="bg-climate-green/10 rounded-lg p-3 text-center">
-                      <div className="text-xs text-climate-green">Temp Change</div>
-                      <div className="text-lg font-bold text-climate-green">+0.4°C</div>
-                    </div>
-                    <div className="bg-climate-blue/10 rounded-lg p-3 text-center">
-                      <div className="text-xs text-climate-blue">CO2</div>
-                      <div className="text-lg font-bold text-climate-blue">-12.5%</div>
-                    </div>
-                  </div>
-                  <div className="bg-white/5 rounded-lg p-4 h-24 flex items-end gap-1">
-                    {[30, 45, 40, 55, 50, 65, 60, 70].map((h, i) => (
-                      <div
-                        key={i}
-                        className="flex-1 rounded-t bg-climate-green/50"
-                        style={{ height: `${h}%` }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {DEMO_SCENARIOS.map((demo) => (
+              <DemoCard key={demo.id} demo={demo} />
+            ))}
           </div>
         </div>
       </section>
