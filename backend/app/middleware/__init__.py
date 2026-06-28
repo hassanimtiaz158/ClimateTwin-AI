@@ -1,18 +1,38 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+"""
+ClimateTwin AI — Middleware
 
-from app.config import settings
+Request-level middleware applied to every incoming request.
+"""
+
+from __future__ import annotations
+
+import logging
+import time
+
+from fastapi import FastAPI, Request, Response
+from starlette.middleware.base import BaseHTTPMiddleware
+
+logger = logging.getLogger(__name__)
 
 
-def setup_middleware(app: FastAPI):
-    """Setup all middleware for the FastAPI app."""
-    
-    # Request timing middleware
-    @app.middleware("http")
-    async def add_process_time_header(request, call_next):
-        import time
-        start_time = time.time()
-        response = await call_next(request)
-        process_time = time.time() - start_time
-        response.headers["X-Process-Time"] = str(process_time)
+class RequestTimingMiddleware(BaseHTTPMiddleware):
+    """Attach an X-Process-Time header to every response."""
+
+    async def dispatch(self, request: Request, call_next) -> Response:
+        start = time.perf_counter()
+        response: Response = await call_next(request)
+        elapsed = time.perf_counter() - start
+        response.headers["X-Process-Time"] = f"{elapsed:.4f}"
+        logger.debug(
+            "%s %s %s %.4fs",
+            request.method,
+            request.url.path,
+            response.status_code,
+            elapsed,
+        )
         return response
+
+
+def register_middleware(app: FastAPI) -> None:
+    """Add all application middleware to the FastAPI app."""
+    app.add_middleware(RequestTimingMiddleware)

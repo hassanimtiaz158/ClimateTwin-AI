@@ -1,8 +1,10 @@
 """
-ClimateTwin AI - Database Configuration
+ClimateTwin AI — Database Layer
 
-Async SQLAlchemy engine, session factory, and dependency injection.
+Async SQLAlchemy engine, session factory, and FastAPI dependency.
 """
+
+from __future__ import annotations
 
 import logging
 from typing import AsyncGenerator
@@ -13,18 +15,15 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.pool import NullPool
 
 from app.config import settings
 
 logger = logging.getLogger(__name__)
 
 
-# ---------------------
-# Engine
-# ---------------------
-def _build_database_url(url: str) -> str:
-    """Convert synchronous PostgreSQL URL to async driver URL."""
+# ── URL normalisation ──────────────────────────────────────────
+def _to_async_url(url: str) -> str:
+    """Ensure the database URL uses the async driver."""
     if url.startswith("postgresql://"):
         return url.replace("postgresql://", "postgresql+asyncpg://", 1)
     if url.startswith("sqlite://"):
@@ -32,26 +31,23 @@ def _build_database_url(url: str) -> str:
     return url
 
 
-async_database_url = _build_database_url(settings.DATABASE_URL)
+_async_url = _to_async_url(settings.DATABASE_URL)
 
-engine = create_async_engine(
-    async_database_url,
+# ── Engine ─────────────────────────────────────────────────────
+_engine_kwargs: dict = dict(
     echo=settings.DEBUG,
     pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
-    pool_recycle=3600,
-    # Use NullPool for SQLite (test) to avoid pool issues
-    connect_args={"check_same_thread": False} if "sqlite" in async_database_url else {},
-    poolclass=NullPool if "sqlite" in async_database_url else None,
 )
 
-logger.info(f"Database engine created for: {async_database_url.split('@')[-1]}")
+if "sqlite" in _async_url:
+    _engine_kwargs.update(poolclass=None, connect_args={"check_same_thread": False})
+else:
+    _engine_kwargs.update(pool_size=10, max_overflow=20, pool_recycle=3600)
 
+engine = create_async_engine(_async_url, **_engine_kwargs)
+logger.info("Database engine ready (%s)", _async_url.split("@")[-1] if "@" in _async_url else _async_url)
 
-# ---------------------
-# Session Factory
-# ---------------------
+# ── Session factory ────────────────────────────────────────────
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,
     class_=AsyncSession,
@@ -59,22 +55,21 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 
-# ---------------------
-# Base Model
-# ---------------------
+# ── Base model ─────────────────────────────────────────────────
 class Base(DeclarativeBase):
-    """Base class for all SQLAlchemy models."""
-    pass
+    """Declarative base for all ORM models."""
 
 
-# ---------------------
-# Dependency
-# ---------------------
+# ── FastAPI dependency ─────────────────────────────────────────
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
-    FastAPI dependency that provides a database session.
+    Yield a database session and ensure proper cleanup.
 
-    Usage:
+    Usage in a router::
+
+        from fastapi import Depends
+        from app.database import get_db
+
         @router.get("/")
         async def handler(db: AsyncSession = Depends(get_db)):
             ...
@@ -84,15 +79,13 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             yield session
         except Exception:
             await session.rollback()
-            logger.exception("Database session error — rolled back")
+            logger.exception("Session error — rolled back")
             raise
         finally:
             await session.close()
 
 
-# ---------------------
-# Helper
-# ---------------------
+# ── Helpers ────────────────────────────────────────────────────
 async def init_db() -> None:
     """Create all tables (dev convenience — use Alembic in prod)."""
     async with engine.begin() as conn:
@@ -101,6 +94,6 @@ async def init_db() -> None:
 
 
 async def close_db() -> None:
-    """Dispose of the engine connection pool."""
+    """Dispose the engine connection pool."""
     await engine.dispose()
     logger.info("Database engine disposed.")

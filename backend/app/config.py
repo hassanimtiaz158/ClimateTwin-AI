@@ -1,17 +1,20 @@
 """
-ClimateTwin AI - Application Configuration
+ClimateTwin AI — Application Configuration
 
-Loads settings from environment variables and .env file.
+All settings are loaded from environment variables (or a .env file).
 """
 
-from typing import List
+from __future__ import annotations
+
 from functools import lru_cache
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import List
+
 from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Application settings loaded from environment variables."""
+    """Central settings object populated from env / .env."""
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -20,46 +23,36 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # ----------------------------
-    # Database
-    # ----------------------------
+    # ── Database ──────────────────────────────────────────────
     DATABASE_URL: str = Field(
         default="postgresql://user:password@localhost:5432/climatetwin",
-        description="PostgreSQL connection string",
+        description="PostgreSQL connection string (sync or async prefix).",
     )
 
-    # ----------------------------
-    # Redis (optional for caching)
-    # ----------------------------
+    # ── Redis (optional) ─────────────────────────────────────
     REDIS_URL: str = Field(
         default="redis://localhost:6379/0",
-        description="Redis connection string",
+        description="Redis connection string.",
     )
-    USE_REDIS: bool = Field(default=False, description="Enable Redis caching")
+    USE_REDIS: bool = Field(default=False, description="Enable Redis caching layer.")
 
-    # ----------------------------
-    # Security
-    # ----------------------------
+    # ── Security ─────────────────────────────────────────────
     SECRET_KEY: str = Field(
         default="super-secret-change-in-production",
-        description="JWT signing key",
+        description="JWT signing secret.",
     )
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(
-        default=30, ge=1, le=1440, description="Token expiry in minutes"
+        default=30, ge=1, le=1440, description="JWT token lifetime in minutes."
     )
-    ALGORITHM: str = Field(default="HS256", description="JWT algorithm")
+    ALGORITHM: str = Field(default="HS256", description="JWT algorithm.")
 
-    # ----------------------------
-    # API Server
-    # ----------------------------
-    API_HOST: str = Field(default="0.0.0.0", description="API bind host")
-    API_PORT: int = Field(default=8000, ge=1, le=65535, description="API bind port")
-    DEBUG: bool = Field(default=True, description="Enable debug mode")
+    # ── Server ───────────────────────────────────────────────
+    API_HOST: str = Field(default="0.0.0.0", description="Uvicorn bind host.")
+    API_PORT: int = Field(default=8000, ge=1, le=65535, description="Uvicorn bind port.")
+    DEBUG: bool = Field(default=True, description="Toggle debug / dev mode.")
 
-    # ----------------------------
-    # CORS
-    # ----------------------------
-    ALLOWED_ORIGINS: List[str] = Field(
+    # ── CORS ─────────────────────────────────────────────────
+    CORS_ORIGINS: List[str] = Field(
         default=[
             "http://localhost:3000",
             "http://localhost:5173",
@@ -67,49 +60,38 @@ class Settings(BaseSettings):
             "http://127.0.0.1:5173",
             "https://climatetwin.vercel.app",
         ],
-        description="Allowed CORS origins",
+        description="Origins allowed by CORS.",
     )
 
-    # ----------------------------
-    # AI / ML
-    # ----------------------------
+    # ── AI / ML ──────────────────────────────────────────────
     MODEL_PATH: str = Field(
-        default="./models/trained", description="Path to trained ML models"
+        default="./models/trained", description="Directory for trained ML models."
     )
     DATASET_PATH: str = Field(
-        default="./datasets", description="Path to climate datasets"
+        default="./datasets", description="Directory for climate datasets."
     )
-    DEFAULTFORECAST_YEARS: int = Field(
-        default=10, ge=1, le=30, description="Default projection horizon"
+    DEFAULT_FORECAST_YEARS: int = Field(
+        default=10, ge=1, le=30, description="Default projection horizon."
     )
 
-    # ----------------------------
-    # Rate Limiting
-    # ----------------------------
+    # ── Rate limiting ────────────────────────────────────────
     RATE_LIMIT_PER_MINUTE: int = Field(
-        default=60, ge=1, description="Requests per minute limit"
+        default=60, ge=1, description="Max requests per minute per client."
     )
 
     @field_validator("DATABASE_URL")
     @classmethod
-    def validate_database_url(cls, v: str) -> str:
-        """Ensure DATABASE_URL uses a supported driver."""
-        valid_prefixes = [
-            "postgresql://",
-            "postgresql+asyncpg://",
-            "sqlite://",
-            "sqlite+aiosqlite://",
-        ]
-        if not any(v.startswith(p) for p in valid_prefixes):
-            raise ValueError(
-                f"DATABASE_URL must start with one of: {valid_prefixes}"
-            )
+    def _validate_db_url(cls, v: str) -> str:
+        allowed = ("postgresql://", "postgresql+asyncpg://", "sqlite://", "sqlite+aiosqlite://")
+        if not v.startswith(allowed):
+            msg = f"DATABASE_URL must start with one of {allowed}"
+            raise ValueError(msg)
         return v
 
 
 @lru_cache()
 def get_settings() -> Settings:
-    """Cached settings singleton."""
+    """Return a cached singleton of Settings."""
     return Settings()
 
 
