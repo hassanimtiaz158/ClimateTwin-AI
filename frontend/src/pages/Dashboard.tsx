@@ -404,44 +404,68 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {ACTION_CONFIG.map((action) => {
-              const value = results[action.key];
-              const percentage = Math.round(value * 100);
+            {ACTION_CONFIG.map((action, index) => {
+              const raw = results[action.key];
+              const value = Number.isFinite(raw) ? raw : 0;   // guard NaN/undefined
+              const percentage = Math.round((value ?? 0) * 100);
               const isActive = value > 0;
               return (
                 <div
                   key={action.key}
-                  className={`relative rounded-xl border p-4 transition-all duration-300 ${
+                  className={`relative rounded-2xl border p-5 transition-all duration-300 ${
                     isActive
-                      ? 'border-gray-200 shadow-sm hover:shadow-md'
-                      : 'border-gray-100 opacity-50'
+                      ? 'border-gray-200 bg-white shadow-sm hover:shadow-md'
+                      : 'border-gray-100 bg-gray-50/60 opacity-60'
                   }`}
                 >
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-lg">{action.icon}</span>
-                    <span className="text-sm font-semibold text-gray-700 truncate">{action.shortLabel}</span>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${action.color} text-xl shadow-sm`}>
+                      <span aria-hidden="true">{action.icon}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-gray-800 truncate">{action.shortLabel}</p>
+                      <p className="text-xs text-gray-400 truncate">{action.label}</p>
+                    </div>
                   </div>
-                  <div className="relative h-4 bg-gray-100 rounded-full overflow-hidden mb-2">
+                  <div
+                    className="relative h-5 rounded-full bg-gray-100 overflow-hidden mb-3"
+                    role="progressbar"
+                    aria-valuenow={percentage}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`${action.label}: ${percentage}%`}
+                  >
                     <div
-                      className={`h-full bg-gradient-to-r ${action.color} rounded-full transition-all duration-700 ease-out`}
-                      style={{ width: `${percentage}%` }}
+                      className={`h-full rounded-full bg-gradient-to-r ${action.color} ${isActive ? '' : 'opacity-40'}`}
+                      style={{
+                        width: `${percentage}%`,
+                        animation: 'grow-width 0.8s cubic-bezier(0.22, 1, 0.36, 1) both',
+                        animationDelay: `${index * 80}ms`,
+                        ['--target-width' as string]: `${percentage}%`,
+                      }}
                     />
-                    {percentage > 0 && (
+                    {isActive && (
                       <div
                         className="absolute inset-0 rounded-full opacity-30"
                         style={{
-                          background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)`,
-                          animation: 'shimmer 2s infinite',
+                          background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%)`,
+                          animation: 'shimmer 2.2s infinite',
                         }}
                       />
                     )}
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-400">{action.label}</span>
-                    <span className={`text-sm font-bold ${
-                      percentage >= 70 ? 'text-green-600' : percentage >= 40 ? 'text-amber-600' : 'text-gray-400'
-                    }`}>
-                      {percentage}%
+                    <span className="text-xs font-medium text-gray-400">
+                      {isActive ? 'Applied' : 'Not applied'}
+                    </span>
+                    <span
+                      className={`text-2xl font-extrabold tabular-nums ${
+                        percentage >= 70 ? 'text-green-600'
+                        : percentage >= 40 ? 'text-amber-600'
+                        : 'text-gray-400'
+                      }`}
+                    >
+                      {percentage}<span className="text-sm">%</span>
                     </span>
                   </div>
                 </div>

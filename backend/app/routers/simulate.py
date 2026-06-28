@@ -91,6 +91,10 @@ async def run_simulation(
     # Generate recommendations
     recommendations = _generate_recommendations(projections, scenario)
 
+    # Commit all changes so the recommendations endpoint (different session)
+    # can see the run, scenario, and projection rows.
+    await db.commit()
+
     return SimulationResultResponse(
         run_id=run.id,
         scenario_id=scenario.id,

@@ -118,20 +118,51 @@ const CLIMATE_ACTIONS = [
 
 // ── Location Data ───────────────────────────────────────────
 const COUNTRIES = [
-  { code: 'US', name: 'United States', cities: ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'] },
-  { code: 'UK', name: 'United Kingdom', cities: ['London', 'Manchester', 'Birmingham', 'Edinburgh', 'Bristol'] },
-  { code: 'DE', name: 'Germany', cities: ['Berlin', 'Munich', 'Hamburg', 'Frankfurt', 'Cologne'] },
-  { code: 'FR', name: 'France', cities: ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice'] },
-  { code: 'JP', name: 'Japan', cities: ['Tokyo', 'Osaka', 'Kyoto', 'Yokohama', 'Nagoya'] },
-  { code: 'IN', name: 'India', cities: ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata'] },
-  { code: 'BR', name: 'Brazil', cities: ['São Paulo', 'Rio de Janeiro', 'Brasília', 'Salvador', 'Fortaleza'] },
-  { code: 'AU', name: 'Australia', cities: ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide'] },
-  { code: 'CA', name: 'Canada', cities: ['Toronto', 'Vancouver', 'Montreal', 'Calgary', 'Ottawa'] },
-  { code: 'NG', name: 'Nigeria', cities: ['Lagos', 'Abuja', 'Kano', 'Ibadan', 'Port Harcourt'] },
-  { code: 'ZA', name: 'South Africa', cities: ['Cape Town', 'Johannesburg', 'Durban', 'Pretoria', 'Port Elizabeth'] },
-  { code: 'EG', name: 'Egypt', cities: ['Cairo', 'Alexandria', 'Giza', 'Luxor', 'Aswan'] },
-  { code: 'PK', name: 'Pakistan', cities: ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad'] },
-  { code: 'BD', name: 'Bangladesh', cities: ['Dhaka', 'Chittagong', 'Khulna', 'Rajshahi', 'Sylhet'] },
+  { code: 'US', name: 'United States', cities: ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose', 'Austin', 'Jacksonville', 'Seattle', 'Denver', 'Washington DC'] },
+  { code: 'UK', name: 'United Kingdom', cities: ['London', 'Manchester', 'Birmingham', 'Edinburgh', 'Bristol', 'Glasgow', 'Liverpool', 'Leeds', 'Sheffield', 'Newcastle', 'Nottingham', 'Cardiff', 'Belfast', 'Brighton', 'Oxford'] },
+  { code: 'DE', name: 'Germany', cities: ['Berlin', 'Munich', 'Hamburg', 'Frankfurt', 'Cologne', 'Stuttgart', 'Düsseldorf', 'Leipzig', 'Dortmund', 'Essen', 'Bremen', 'Dresden', 'Hannover', 'Nuremberg', 'Heidelberg'] },
+  { code: 'FR', name: 'France', cities: ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice', 'Nantes', 'Strasbourg', 'Montpellier', 'Bordeaux', 'Lille', 'Rennes', 'Reims', 'Toulon', 'Le Havre', 'Grenoble'] },
+  { code: 'JP', name: 'Japan', cities: ['Tokyo', 'Osaka', 'Kyoto', 'Yokohama', 'Nagoya', 'Sapporo', 'Fukuoka', 'Kobe', 'Kawasaki', 'Hiroshima', 'Sendai', 'Kitakyushu', 'Chiba', 'Sakai', 'Niigata'] },
+  { code: 'IN', name: 'India', cities: ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata', 'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur', 'Lucknow', 'Chandigarh', 'Kochi', 'Indore', 'Bhopal', 'Visakhapatnam'] },
+  { code: 'BR', name: 'Brazil', cities: ['São Paulo', 'Rio de Janeiro', 'Brasília', 'Salvador', 'Fortaleza', 'Belo Horizonte', 'Manaus', 'Curitiba', 'Recife', 'Porto Alegre', 'Belém', 'Goiânia', 'Campinas', 'Florianópolis', 'Natal'] },
+  { code: 'AU', name: 'Australia', cities: ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Gold Coast', 'Canberra', 'Newcastle', 'Hobart', 'Darwin', 'Wollongong', 'Cairns', 'Townsville', 'Geelong', 'Ballarat'] },
+  { code: 'CA', name: 'Canada', cities: ['Toronto', 'Vancouver', 'Montreal', 'Calgary', 'Ottawa', 'Edmonton', 'Winnipeg', 'Halifax', 'Victoria', 'Quebec City', 'Hamilton', 'Kitchener', 'London', 'Saskatoon', 'Regina'] },
+  { code: 'CN', name: 'China', cities: ['Beijing', 'Shanghai', 'Guangzhou', 'Shenzhen', 'Chengdu', 'Hangzhou', 'Wuhan', 'Xian', 'Nanjing', 'Chongqing', 'Tianjin', 'Suzhou', 'Harbin', 'Qingdao', 'Dalian'] },
+  { code: 'KR', name: 'South Korea', cities: ['Seoul', 'Busan', 'Incheon', 'Daegu', 'Daejeon', 'Gwangju', 'Ulsan', 'Suwon', 'Changwon', 'Jeonju'] },
+  { code: 'IT', name: 'Italy', cities: ['Rome', 'Milan', 'Naples', 'Turin', 'Palermo', 'Genoa', 'Bologna', 'Florence', 'Bari', 'Venice', 'Catania', 'Verona', 'Messina', 'Padua', 'Trieste'] },
+  { code: 'ES', name: 'Spain', cities: ['Madrid', 'Barcelona', 'Valencia', 'Seville', 'Zaragoza', 'Malaga', 'Murcia', 'Palma', 'Bilbao', 'Alicante', 'Cordoba', 'Valladolid', 'Vigo', 'Gijon', 'Granada'] },
+  { code: 'MX', name: 'Mexico', cities: ['Mexico City', 'Guadalajara', 'Monterrey', 'Puebla', 'Tijuana', 'Cancun', 'Merida', 'Leon', 'Queretaro', 'Chihuahua', 'Aguascalientes', 'Veracruz', 'Oaxaca', 'Morelia', 'Durango'] },
+  { code: 'RU', name: 'Russia', cities: ['Moscow', 'Saint Petersburg', 'Novosibirsk', 'Yekaterinburg', 'Kazan', 'Nizhny Novgorod', 'Samara', 'Omsk', 'Rostov-on-Don', 'Chelyabinsk', 'Ufa', 'Volgograd', 'Krasnodar', 'Voronezh', 'Perm'] },
+  { code: 'SA', name: 'Saudi Arabia', cities: ['Riyadh', 'Jeddah', 'Mecca', 'Medina', 'Dammam', 'Khobar', 'Taif', 'Tabuk', 'Abha', 'Buraidah'] },
+  { code: 'AE', name: 'United Arab Emirates', cities: ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain', 'Al Ain'] },
+  { code: 'NG', name: 'Nigeria', cities: ['Lagos', 'Abuja', 'Kano', 'Ibadan', 'Port Harcourt', 'Benin City', 'Kaduna', 'Maiduguri', 'Zaria', 'Aba', 'Jos', 'Ilorin', 'Enugu', 'Abeokuta', 'Calabar'] },
+  { code: 'ZA', name: 'South Africa', cities: ['Cape Town', 'Johannesburg', 'Durban', 'Pretoria', 'Port Elizabeth', 'Bloemfontein', 'Nelspruit', 'Stellenbosch', 'East London', 'Kimberley'] },
+  { code: 'EG', name: 'Egypt', cities: ['Cairo', 'Alexandria', 'Giza', 'Luxor', 'Aswan', 'Sharm El Sheikh', 'Hurghada', 'Mansoura', 'Tanta', 'Suez', 'Ismailia', 'Faiyum', 'Minya', 'Sohag', 'Assiut'] },
+  { code: 'PK', name: 'Pakistan', cities: ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta', 'Sialkot', 'Gujranwala', 'Hyderabad', 'Bahawalpur', 'Sargodha', 'Abbottabad', 'Mardan'] },
+  { code: 'BD', name: 'Bangladesh', cities: ['Dhaka', 'Chittagong', 'Khulna', 'Rajshahi', 'Sylhet', 'Comilla', 'Gazipur', 'Narayanganj', 'Rangpur', 'Mymensingh', 'Barisal', 'Tongi', 'Bogra', 'Cox Bazar', 'Dinajpur'] },
+  { code: 'ID', name: 'Indonesia', cities: ['Jakarta', 'Surabaya', 'Bandung', 'Medan', 'Semarang', 'Makassar', 'Palembang', 'Depok', 'Tangerang', 'Bekasi', 'Denpasar', 'Yogyakarta', 'Malang', 'Padang', 'Manado'] },
+  { code: 'TH', name: 'Thailand', cities: ['Bangkok', 'Chiang Mai', 'Pattaya', 'Phuket', 'Nakhon Ratchasima', 'Chiang Rai', 'Udon Thani', 'Khon Kaen', 'Hat Yai', 'Surat Thani'] },
+  { code: 'VN', name: 'Vietnam', cities: ['Ho Chi Minh City', 'Hanoi', 'Da Nang', 'Hai Phong', 'Can Tho', 'Nha Trang', 'Hue', 'Vung Tau', 'Bien Hoa', 'Buon Ma Thuot'] },
+  { code: 'TR', name: 'Turkey', cities: ['Istanbul', 'Ankara', 'Izmir', 'Bursa', 'Antalya', 'Adana', 'Konya', 'Gaziantep', 'Mersin', 'Kayseri', 'Eskisehir', 'Trabzon', 'Samsun', 'Denizli', 'Malatya'] },
+  { code: 'SE', name: 'Sweden', cities: ['Stockholm', 'Gothenburg', 'Malmo', 'Uppsala', 'Linkoping', 'Vasteras', 'Orebro', 'Umea', 'Lund', 'Helsingborg'] },
+  { code: 'NO', name: 'Norway', cities: ['Oslo', 'Bergen', 'Stavanger', 'Trondheim', 'Tromso', 'Drammen', 'Fredrikstad', 'Kristiansand', 'Bodo', 'Alesund'] },
+  { code: 'DK', name: 'Denmark', cities: ['Copenhagen', 'Aarhus', 'Odense', 'Aalborg', 'Esbjerg', 'Randers', 'Kolding', 'Horsens', 'Vejle', 'Roskilde'] },
+  { code: 'NL', name: 'Netherlands', cities: ['Amsterdam', 'Rotterdam', 'The Hague', 'Utrecht', 'Eindhoven', 'Groningen', 'Tilburg', 'Almere', 'Breda', 'Nijmegen'] },
+  { code: 'CH', name: 'Switzerland', cities: ['Zurich', 'Geneva', 'Basel', 'Lausanne', 'Bern', 'Winterthur', 'Lucerne', 'St. Gallen', 'Lugano', 'Biel'] },
+  { code: 'AR', name: 'Argentina', cities: ['Buenos Aires', 'Cordoba', 'Rosario', 'Mendoza', 'La Plata', 'Tucuman', 'Mar del Plata', 'Salta', 'Santa Fe', 'Neuquen'] },
+  { code: 'CL', name: 'Chile', cities: ['Santiago', 'Valparaiso', 'Concepcion', 'La Serena', 'Antofagasta', 'Temuco', 'Rancagua', 'Arica', 'Talca', 'Puerto Montt'] },
+  { code: 'CO', name: 'Colombia', cities: ['Bogota', 'Medellin', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Pereira', 'Santa Marta', 'Manizales', 'Ibague'] },
+  { code: 'KE', name: 'Kenya', cities: ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret', 'Malindi', 'Kitale', 'Thika', 'Nyeri', 'Nanyuki'] },
+  { code: 'MA', name: 'Morocco', cities: ['Casablanca', 'Rabat', 'Marrakech', 'Fes', 'Tangier', 'Agadir', 'Meknes', 'Oujda', 'Kenitra', 'Nador'] },
+  { code: 'GH', name: 'Ghana', cities: ['Accra', 'Kumasi', 'Tamale', 'Cape Coast', 'Takoradi', 'Tema', 'Sunyani', 'Ho', 'Koforidua', 'Wa'] },
+  { code: 'MY', name: 'Malaysia', cities: ['Kuala Lumpur', 'Penang', 'Johor Bahru', 'Malacca', 'Kota Kinabalu', 'Kuching', 'Ipoh', "Shah Alam", 'Petaling Jaya', 'Putrajaya'] },
+  { code: 'SG', name: 'Singapore', cities: ['Singapore'] },
+  { code: 'NZ', name: 'New Zealand', cities: ['Auckland', 'Wellington', 'Christchurch', 'Hamilton', 'Tauranga', 'Dunedin', 'Palmerston North', 'Napier', 'Rotorua', 'Queenstown'] },
+  { code: 'IE', name: 'Ireland', cities: ['Dublin', 'Cork', 'Limerick', 'Galway', 'Waterford', 'Drogheda', 'Dundalk', 'Kilkenny', 'Sligo', 'Wexford'] },
+  { code: 'PT', name: 'Portugal', cities: ['Lisbon', 'Porto', 'Braga', 'Coimbra', 'Faro', 'Funchal', 'Aveiro', 'Evora', 'Guimaraes', 'Setubal'] },
+  { code: 'PL', name: 'Poland', cities: ['Warsaw', 'Krakow', 'Wroclaw', 'Gdansk', 'Poznan', 'Lodz', 'Lublin', 'Katowice', 'Szczecin', 'Bydgoszcz'] },
+  { code: 'GR', name: 'Greece', cities: ['Athens', 'Thessaloniki', 'Patras', 'Heraklion', 'Larissa', 'Volos', 'Ioannina', 'Rhodes', 'Chania', 'Kavala'] },
+  { code: 'IL', name: 'Israel', cities: ['Tel Aviv', 'Jerusalem', 'Haifa', 'Beersheba', 'Eilat', 'Ashdod', 'Netanya', 'Petah Tikva', 'Rishon LeZion', 'Rehovot'] },
   { code: 'GLOBAL', name: 'Global (Worldwide)', cities: ['Global'] },
 ];
 
@@ -543,27 +574,45 @@ export default function ScenarioBuilder() {
       )}
 
       {/* Summary Bar */}
-      <div className="card bg-gradient-to-r from-primary-500/5 to-emerald-50/50">
+      <div className={`card transition-all duration-300 ${
+        getActiveActionsCount() === 0
+          ? 'bg-gradient-to-r from-amber-50/60 to-orange-50/40 border-amber-200'
+          : 'bg-gradient-to-r from-primary-500/5 to-emerald-50/50'
+      }`}>
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-semibold text-gray-800">Climate Action Summary</h3>
             <p className="text-sm text-gray-500">
-              {getActiveActionsCount()} of 6 actions selected
+              {getActiveActionsCount() === 0
+                ? 'No actions selected yet — pick at least one below'
+                : `${getActiveActionsCount()} of 6 actions selected`}
             </p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-primary-600">
+            <div className={`text-2xl font-bold ${
+              getTotalSliderValue() === 0 ? 'text-gray-300' : 'text-primary-600'
+            }`}>
               {getTotalSliderValue().toFixed(1)}
             </div>
             <div className="text-xs text-gray-500">Total Effort Score</div>
           </div>
         </div>
-        <div className="mt-3 h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div className="mt-3 h-2.5 bg-gray-200 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-primary-500 to-emerald-500 transition-all duration-500"
-            style={{ width: `${(getTotalSliderValue() / 6) * 100}%` }}
+            className={`h-full rounded-full transition-all duration-500 ${
+              getTotalSliderValue() === 0
+                ? 'bg-gray-300'
+                : 'bg-gradient-to-r from-primary-500 to-emerald-500'
+            }`}
+            style={{ width: `${Math.max((getTotalSliderValue() / 6) * 100, 0)}%` }}
           />
         </div>
+        {getActiveActionsCount() === 0 && (
+          <p className="mt-3 text-xs text-amber-700 flex items-center gap-1.5">
+            <InformationCircleIcon className="h-3.5 w-3.5 flex-shrink-0" />
+            Move any slider above to start modeling its climate impact.
+          </p>
+        )}
       </div>
 
       {/* Action Cards */}
@@ -577,7 +626,7 @@ export default function ScenarioBuilder() {
             <div
               key={action.id}
               className={`card transition-all duration-300 ${
-                isActive ? `border-2 ${action.borderColor} shadow-md` : 'border border-gray-100'
+                isActive ? `border-2 ${action.borderColor} shadow-md` : 'border border-gray-100 opacity-80 hover:opacity-100'
               }`}
             >
               <div className="flex flex-col md:flex-row md:items-center gap-4">
@@ -607,17 +656,43 @@ export default function ScenarioBuilder() {
                   </div>
                 </div>
 
-                {/* Slider */}
-                <div className="md:w-64 space-y-2">
+                {/* Score Bar */}
+                <div className="md:w-72 space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-gray-600">{action.sliderLabel}</span>
-                    <span className={`text-sm font-bold ${
-                      value >= 0.7 ? 'text-primary-600' : value >= 0.4 ? 'text-climate-yellow' : 'text-gray-400'
+                    <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600">
+                      <action.icon className={`h-4 w-4 ${action.textColor}`} />
+                      {action.shortLabel}
+                    </span>
+                    <span className={`text-lg font-extrabold tabular-nums ${
+                      value === 0 ? 'text-gray-300'
+                      : value >= 0.7 ? 'text-primary-600'
+                      : value >= 0.4 ? 'text-amber-600'
+                      : 'text-gray-500'
                     }`}>
-                      {value.toFixed(1)}
+                      {value === 0 ? '0' : Math.round(value * 100)}<span className="text-xs font-bold">%</span>
                     </span>
                   </div>
-                  <div className="relative">
+                  <div
+                    className="relative h-4 rounded-full bg-gray-100 overflow-hidden"
+                    role="progressbar"
+                    aria-valuenow={Math.round(value * 100)}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`${action.label}: ${Math.round(value * 100)}%`}
+                  >
+                    <div
+                      className={`h-full rounded-full bg-gradient-to-r ${action.color} transition-all duration-300 ease-out`}
+                      style={{ width: `${value * 100}%` }}
+                    />
+                    {value > 0 && (
+                      <div
+                        className="absolute inset-0 rounded-full opacity-30"
+                        style={{
+                          background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)`,
+                          animation: 'shimmer 2.5s infinite',
+                        }}
+                      />
+                    )}
                     <input
                       type="range"
                       min="0"
@@ -625,28 +700,13 @@ export default function ScenarioBuilder() {
                       step="0.1"
                       value={value}
                       onChange={(e) => updateSlider(action.id as keyof ScenarioConfig, parseFloat(e.target.value))}
-                      className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer
-                        [&::-webkit-slider-thumb]:appearance-none
-                        [&::-webkit-slider-thumb]:h-5
-                        [&::-webkit-slider-thumb]:w-5
-                        [&::-webkit-slider-thumb]:rounded-full
-                        [&::-webkit-slider-thumb]:bg-white
-                        [&::-webkit-slider-thumb]:shadow-md
-                        [&::-webkit-slider-thumb]:border-2
-                        [&::-webkit-slider-thumb]:border-primary-400
-                        [&::-webkit-slider-thumb]:cursor-pointer
-                        [&::-webkit-slider-thumb]:transition-all
-                        [&::-webkit-slider-thumb]:hover:scale-110"
-                    />
-                    <div
-                      className={`absolute top-0 left-0 h-3 rounded-lg bg-gradient-to-r ${getSliderColorClass(value)} pointer-events-none`}
-                      style={{ width: `${value * 100}%` }}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
                   </div>
                   <div className="flex justify-between text-xs text-gray-400">
                     <span>None</span>
-                    <span className={`font-medium ${
-                      value >= 0.7 ? 'text-primary-600' : value >= 0.4 ? 'text-climate-yellow' : ''
+                    <span className={`font-semibold ${
+                      value >= 0.7 ? 'text-primary-600' : value >= 0.4 ? 'text-amber-600' : value > 0 ? 'text-gray-500' : ''
                     }`}>
                       {getSliderIntensity(value)}
                     </span>
