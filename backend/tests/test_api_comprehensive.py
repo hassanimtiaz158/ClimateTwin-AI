@@ -301,7 +301,9 @@ async def test_simulation_metrics_keys(client: AsyncClient):
 async def test_history_empty(client: AsyncClient):
     response = await client.get("/api/history/")
     assert response.status_code == 200
-    assert isinstance(response.json(), list)
+    data = response.json()
+    assert "items" in data
+    assert isinstance(data["items"], list)
 
 
 @pytest.mark.asyncio
@@ -312,7 +314,7 @@ async def test_history_after_simulation(client: AsyncClient):
     response = await client.get("/api/history/")
     assert response.status_code == 200
     data = response.json()
-    assert len(data) >= 1
+    assert len(data["items"]) >= 1
 
 
 @pytest.mark.asyncio

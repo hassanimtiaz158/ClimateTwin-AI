@@ -114,3 +114,11 @@ export interface HistoryItem {
   completed_at?: string;
   created_at: string;
 }
+
+export interface PaginatedHistory {
+  items: HistoryItem[];
+  total: number;
+  page: number;
+  page_size: number;
+  pages: number;
+}

@@ -4,7 +4,7 @@ import type {
   Scenario,
   SimulationResults,
   Recommendations,
-  HistoryItem,
+  PaginatedHistory,
 } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
@@ -129,8 +129,8 @@ export const api = {
   },
 
   // ── History ──────────────────────────────────────────────────
-  async getHistory(): Promise<HistoryItem[]> {
-    return client.get('/history') as Promise<HistoryItem[]>;
+  async getHistory(page: number = 1, pageSize: number = 20): Promise<PaginatedHistory> {
+    return client.get('/history', { params: { page, page_size: pageSize } }) as Promise<PaginatedHistory>;
   },
 
   // ── Recommendations ──────────────────────────────────────────

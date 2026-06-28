@@ -152,10 +152,10 @@ describe('api', () => {
   });
 
   describe('getHistory', () => {
-    it('calls GET /history', async () => {
-      mockGet.mockResolvedValue({ data: [] });
-      await api.getHistory();
-      expect(mockGet).toHaveBeenCalledWith('/history');
+    it('calls GET /history with pagination params', async () => {
+      mockGet.mockResolvedValue({ data: { items: [], total: 0, page: 1, page_size: 20, pages: 0 } });
+      await api.getHistory(1, 20);
+      expect(mockGet).toHaveBeenCalledWith('/history', { params: { page: 1, page_size: 20 } });
     });
   });
 

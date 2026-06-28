@@ -9,9 +9,11 @@ import {
   CheckCircleIcon,
   PlayIcon,
   FunnelIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from '@heroicons/react/24/outline';
 import { api, ApiError } from '../services/api';
-import type { HistoryItem } from '../types';
+import type { PaginatedHistory } from '../types';
 
 function formatDate(dateStr: string): string {
   try {
@@ -63,17 +65,19 @@ function getStatusBadge(status: string) {
 type StatusFilter = 'all' | 'completed' | 'running' | 'failed' | 'pending';
 
 export default function History() {
-  const [runs, setRuns] = useState<HistoryItem[]>([]);
+  const [data, setData] = useState<PaginatedHistory | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const pageSize = 20;
 
-  const fetchHistory = useCallback(async () => {
+  const fetchHistory = useCallback(async (pageNum: number) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await api.getHistory();
-      setRuns(data);
+      const result = await api.getHistory(pageNum, pageSize);
+      setData(result);
     } catch (err) {
       const msg = err instanceof ApiError
         ? err.detail
@@ -85,22 +89,17 @@ export default function History() {
   }, []);
 
   useEffect(() => {
-    fetchHistory();
-  }, [fetchHistory]);
+    fetchHistory(page);
+  }, [page, fetchHistory]);
 
-  const filteredRuns = useMemo(() => {
-    if (statusFilter === 'all') return runs;
-    return runs.filter((r) => r.status === statusFilter);
-  }, [runs, statusFilter]);
-
-  const statusCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: runs.length, completed: 0, running: 0, failed: 0, pending: 0 };
-    runs.forEach((r) => { counts[r.status] = (counts[r.status] || 0) + 1; });
-    return counts;
-  }, [runs]);
+  const filteredItems = useMemo(() => {
+    if (!data) return [];
+    if (statusFilter === 'all') return data.items;
+    return data.items.filter((r) => r.status === statusFilter);
+  }, [data, statusFilter]);
 
   // ── Loading State ──────────────────────────────────────────
-  if (loading) {
+  if (loading && !data) {
     return (
       <div className="max-w-4xl mx-auto">
         <Header />
@@ -117,7 +116,7 @@ export default function History() {
   }
 
   // ── Error State ────────────────────────────────────────────
-  if (error) {
+  if (error && !data) {
     return (
       <div className="max-w-4xl mx-auto">
         <Header />
@@ -128,7 +127,7 @@ export default function History() {
           <h2 className="text-lg font-semibold text-gray-800 mb-1">Failed to load history</h2>
           <p className="text-gray-500 text-sm mb-4 max-w-md text-center">{error}</p>
           <button
-            onClick={fetchHistory}
+            onClick={() => fetchHistory(page)}
             className="flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors text-sm font-medium"
           >
             <ArrowPathIcon className="h-4 w-4" />
@@ -139,20 +138,23 @@ export default function History() {
     );
   }
 
+  const total = data?.total ?? 0;
+  const totalPages = data?.pages ?? 0;
+
   // ── Main Content ───────────────────────────────────────────
   return (
     <div className="max-w-4xl mx-auto animate-fade-in">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Simulation History</h1>
-          <p className="text-gray-500 text-sm mt-1">{runs.length} simulation{runs.length !== 1 ? 's' : ''} total</p>
+          <p className="text-gray-500 text-sm mt-1">{total} simulation{total !== 1 ? 's' : ''} total</p>
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={fetchHistory}
+            onClick={() => fetchHistory(page)}
             className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors text-sm font-medium"
           >
-            <ArrowPathIcon className="h-4 w-4" />
+            <ArrowPathIcon className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </button>
           <Link
@@ -166,7 +168,7 @@ export default function History() {
       </div>
 
       {/* Status Filter Tabs */}
-      {runs.length > 0 && (
+      {total > 0 && (
         <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1">
           <FunnelIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
           {(['all', 'completed', 'running', 'failed', 'pending'] as StatusFilter[]).map((filter) => (
@@ -180,13 +182,12 @@ export default function History() {
               }`}
             >
               {filter.charAt(0).toUpperCase() + filter.slice(1)}
-              <span className="ml-1 text-[10px] opacity-70">({statusCounts[filter] || 0})</span>
             </button>
           ))}
         </div>
       )}
 
-      {filteredRuns.length === 0 ? (
+      {filteredItems.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-card text-center py-16">
           <ClockIcon className="h-14 w-14 text-gray-300 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-700 mb-2">
@@ -206,45 +207,74 @@ export default function History() {
           </Link>
         </div>
       ) : (
-        <div className="space-y-3 stagger-children">
-          {filteredRuns.map((run) => (
-            <div
-              key={run.id}
-              className="bg-white rounded-2xl shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all p-5 flex items-center justify-between"
-            >
-              <div className="flex items-center gap-4">
-                <div className={`p-2.5 rounded-xl ${getStatusBg(run.status)}`}>
-                  {getStatusIcon(run.status)}
+        <>
+          <div className="space-y-3 stagger-children">
+            {filteredItems.map((run) => (
+              <div
+                key={run.id}
+                className="bg-white rounded-2xl shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all p-5 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`p-2.5 rounded-xl ${getStatusBg(run.status)}`}>
+                    {getStatusIcon(run.status)}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-800">
+                      Scenario {run.scenario_id.slice(0, 8)}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {formatDate(run.created_at)}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5 font-mono">
+                      Run: {run.id.slice(0, 8)}...
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800">
-                    Scenario {run.scenario_id.slice(0, 8)}
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {formatDate(run.created_at)}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-0.5 font-mono">
-                    Run: {run.id.slice(0, 8)}...
-                  </p>
+                <div className="flex items-center gap-4">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(run.status)}`}>
+                    {run.status.charAt(0).toUpperCase() + run.status.slice(1)}
+                  </span>
+                  {run.status === 'completed' && (
+                    <Link
+                      to={`/dashboard/${run.id}`}
+                      className="flex items-center gap-1.5 px-4 py-2 bg-primary-50 text-primary-600 rounded-xl hover:bg-primary-100 transition-colors text-sm font-medium"
+                    >
+                      View Results
+                      <ArrowRightIcon className="h-4 w-4" />
+                    </Link>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(run.status)}`}>
-                  {run.status.charAt(0).toUpperCase() + run.status.slice(1)}
-                </span>
-                {run.status === 'completed' && (
-                  <Link
-                    to={`/dashboard/${run.id}`}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-primary-50 text-primary-600 rounded-xl hover:bg-primary-100 transition-colors text-sm font-medium"
-                  >
-                    View Results
-                    <ArrowRightIcon className="h-4 w-4" />
-                  </Link>
-                )}
+            ))}
+          </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-8 bg-white rounded-2xl shadow-card p-4">
+              <p className="text-sm text-gray-500">
+                Page {page} of {totalPages}
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium border border-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                >
+                  <ChevronLeftIcon className="h-4 w-4" />
+                  Previous
+                </button>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium border border-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                >
+                  Next
+                  <ChevronRightIcon className="h-4 w-4" />
+                </button>
               </div>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );

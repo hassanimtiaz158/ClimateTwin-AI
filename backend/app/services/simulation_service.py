@@ -142,3 +142,11 @@ class SimulationService:
             .order_by(SimulationRun.created_at.desc())
         )
         return list(result.scalars().all())
+
+    async def get_history_count(self) -> int:
+        """Get total number of simulation runs."""
+        from sqlalchemy import func
+        result = await self.db.execute(
+            select(func.count()).select_from(SimulationRun)
+        )
+        return result.scalar_one()

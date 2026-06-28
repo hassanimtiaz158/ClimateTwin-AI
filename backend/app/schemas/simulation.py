@@ -113,5 +113,16 @@ class SimulationResultResponse(BaseModel):
     recommendations: List[Dict[str, Any]]
 
 
+# ── Paginated History ──────────────────────────────────────────
+class PaginatedHistoryResponse(BaseModel):
+    """Paginated list of simulation runs."""
+
+    items: List[SimulationRunSummary]
+    total: int
+    page: int
+    page_size: int
+    pages: int
+
+
 # ── Backward-compatible aliases ────────────────────────────────
 SimulationStatus = SimulationRunSummary

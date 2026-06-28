@@ -1,13 +1,13 @@
 """
-History Router - View past simulation runs.
+History Router - View past simulation runs with pagination.
 """
 
-from typing import List
+import math
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.schemas.simulation import SimulationStatus
+from app.schemas.simulation import PaginatedHistoryResponse
 from app.services.simulation_service import SimulationService
 
 router = APIRouter()
@@ -15,19 +15,28 @@ router = APIRouter()
 
 @router.get(
     "/",
-    response_model=List[SimulationStatus],
+    response_model=PaginatedHistoryResponse,
     summary="Get simulation history",
 )
 async def get_history(
-    skip: int = Query(0, ge=0, description="Records to skip"),
-    limit: int = Query(50, ge=1, le=200, description="Max records to return"),
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     db: AsyncSession = Depends(get_db),
 ):
     """
     Retrieve simulation history with pagination.
 
-    Returns a list of simulation runs ordered by creation date (newest first).
+    Returns a paginated list of simulation runs ordered by creation date (newest first).
     """
     service = SimulationService(db)
-    runs = await service.get_history(skip=skip, limit=limit)
-    return runs
+    total = await service.get_history_count()
+    skip = (page - 1) * page_size
+    runs = await service.get_history(skip=skip, limit=page_size)
+
+    return PaginatedHistoryResponse(
+        items=runs,
+        total=total,
+        page=page,
+        page_size=page_size,
+        pages=math.ceil(total / page_size) if total > 0 else 0,
+    )
