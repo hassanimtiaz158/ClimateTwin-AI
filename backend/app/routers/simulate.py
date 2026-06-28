@@ -57,11 +57,12 @@ async def run_simulation(
             city=request.city or "Global",
             country=request.country or "Global",
             target_year=request.target_year or 2035,
-            renewable_energy_slider=request.renewable_energy_slider or 0.0,
-            public_transit_slider=request.public_transit_slider or 0.0,
             reforestation_slider=request.reforestation_slider or 0.0,
-            carbon_tax_slider=request.carbon_tax_slider or 0.0,
-            green_innovation_slider=request.green_innovation_slider or 0.0,
+            renewable_energy_slider=request.renewable_energy_slider or 0.0,
+            ev_adoption_slider=request.ev_adoption_slider or 0.0,
+            emission_reduction_slider=request.emission_reduction_slider or 0.0,
+            public_transit_slider=request.public_transit_slider or 0.0,
+            water_conservation_slider=request.water_conservation_slider or 0.0,
         )
         db.add(scenario)
         await db.flush()
@@ -183,7 +184,7 @@ def _generate_recommendations(projections: list, scenario: Scenario) -> list:
             "priority": "high",
             "title": "CO2 Levels Critical",
             "description": f"CO2 projected to reach {last['co2_level']:.0f} ppm. Implement carbon reduction measures.",
-            "action": "carbon_tax",
+            "action": "emission_reduction",
             "confidence": 0.9,
         })
 
@@ -204,7 +205,7 @@ def _generate_recommendations(projections: list, scenario: Scenario) -> list:
             "category": "air_quality",
             "priority": "medium",
             "title": "Air Quality Worsening",
-            "description": f"AQI projected at {last['air_quality_index']:.0f}. Invest in public transit.",
+            "description": f"AQI projected at {last['air_quality_index']:.0f}. Invest in public transit and EVs.",
             "action": "public_transit",
             "confidence": 0.75,
         })
@@ -215,8 +216,8 @@ def _generate_recommendations(projections: list, scenario: Scenario) -> list:
             "category": "heatwave",
             "priority": "medium",
             "title": "Heatwave Days Increasing",
-            "description": f"Projected {last['heatwave_frequency']:.0f} heatwave days/year. Implement green building standards.",
-            "action": "green_buildings",
+            "description": f"Projected {last['heatwave_frequency']:.0f} heatwave days/year. Increase tree planting.",
+            "action": "reforestation",
             "confidence": 0.7,
         })
 
@@ -229,6 +230,17 @@ def _generate_recommendations(projections: list, scenario: Scenario) -> list:
             "description": f"Biodiversity score projected at {last['biodiversity_score']:.2f}. Protect natural habitats.",
             "action": "reforestation",
             "confidence": 0.7,
+        })
+
+    # Water stress
+    if last["water_stress"] > 0.6:
+        recommendations.append({
+            "category": "water",
+            "priority": "medium",
+            "title": "Water Stress Increasing",
+            "description": f"Water stress projected at {last['water_stress']:.2f}. Implement water conservation.",
+            "action": "water_conservation",
+            "confidence": 0.75,
         })
 
     # Default recommendation if no issues

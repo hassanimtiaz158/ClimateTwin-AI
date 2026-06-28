@@ -27,7 +27,19 @@ client.interceptors.response.use(
 export const api = {
   // Scenarios
   async createScenario(config: ScenarioConfig): Promise<Scenario> {
-    const response = await client.post('/scenarios', config);
+    const response = await client.post('/scenarios', {
+      name: config.name,
+      city: config.city,
+      country: config.country,
+      target_year: config.targetYear,
+      reforestation_slider: config.reforestationSlider,
+      renewable_energy_slider: config.renewableEnergySlider,
+      ev_adoption_slider: config.evAdoptionSlider,
+      emission_reduction_slider: config.emissionReductionSlider,
+      public_transit_slider: config.publicTransitSlider,
+      water_conservation_slider: config.waterConservationSlider,
+      notes: config.notes,
+    });
     return response as unknown as Scenario;
   },
 
@@ -42,7 +54,20 @@ export const api = {
   },
 
   async updateScenario(id: string, data: Partial<ScenarioConfig>): Promise<Scenario> {
-    const response = await client.patch(`/scenarios/${id}`, data);
+    const updateData: Record<string, unknown> = {};
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.city !== undefined) updateData.city = data.city;
+    if (data.country !== undefined) updateData.country = data.country;
+    if (data.targetYear !== undefined) updateData.target_year = data.targetYear;
+    if (data.reforestationSlider !== undefined) updateData.reforestation_slider = data.reforestationSlider;
+    if (data.renewableEnergySlider !== undefined) updateData.renewable_energy_slider = data.renewableEnergySlider;
+    if (data.evAdoptionSlider !== undefined) updateData.ev_adoption_slider = data.evAdoptionSlider;
+    if (data.emissionReductionSlider !== undefined) updateData.emission_reduction_slider = data.emissionReductionSlider;
+    if (data.publicTransitSlider !== undefined) updateData.public_transit_slider = data.publicTransitSlider;
+    if (data.waterConservationSlider !== undefined) updateData.water_conservation_slider = data.waterConservationSlider;
+    if (data.notes !== undefined) updateData.notes = data.notes;
+
+    const response = await client.patch(`/scenarios/${id}`, updateData);
     return response as unknown as Scenario;
   },
 
@@ -61,11 +86,12 @@ export const api = {
       city: config.city,
       country: config.country,
       target_year: config.targetYear,
-      renewable_energy_slider: config.renewableEnergySlider,
-      public_transit_slider: config.publicTransitSlider,
       reforestation_slider: config.reforestationSlider,
-      carbon_tax_slider: config.carbonTaxSlider,
-      green_innovation_slider: config.greenInnovationSlider,
+      renewable_energy_slider: config.renewableEnergySlider,
+      ev_adoption_slider: config.evAdoptionSlider,
+      emission_reduction_slider: config.emissionReductionSlider,
+      public_transit_slider: config.publicTransitSlider,
+      water_conservation_slider: config.waterConservationSlider,
     });
     return response as unknown as SimulationResults;
   },

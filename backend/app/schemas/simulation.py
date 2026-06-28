@@ -18,18 +18,19 @@ class SimulationRequest(BaseModel):
     """Payload for triggering a simulation run."""
 
     scenario_id: Optional[UUID] = Field(None, description="Scenario ID to simulate (if exists)")
-    
+
     # ── Inline scenario fields (if scenario_id not provided) ──
     city: Optional[str] = Field(None, max_length=100, description="Target city")
     country: Optional[str] = Field(None, max_length=100, description="Target country")
     target_year: Optional[int] = Field(None, ge=2025, le=2050, description="Projection target year")
-    
+
     # ── Sustainability policy sliders ─────────────────────────
-    renewable_energy_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
-    public_transit_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
     reforestation_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
-    carbon_tax_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
-    green_innovation_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
+    renewable_energy_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
+    ev_adoption_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
+    emission_reduction_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
+    public_transit_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
+    water_conservation_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
 
 
 # ── Read ───────────────────────────────────────────────────────

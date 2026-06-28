@@ -21,11 +21,12 @@ const initialScenario: Partial<ScenarioConfig> = {
   city: '',
   country: '',
   targetYear: 2035,
-  renewableEnergySlider: 0.5,
-  publicTransitSlider: 0.5,
-  reforestationSlider: 0.5,
-  carbonTaxSlider: 0.5,
-  greenInnovationSlider: 0.5,
+  reforestationSlider: 0.0,
+  renewableEnergySlider: 0.0,
+  evAdoptionSlider: 0.0,
+  emissionReductionSlider: 0.0,
+  publicTransitSlider: 0.0,
+  waterConservationSlider: 0.0,
 };
 
 export const useStore = create<AppState>((set) => ({

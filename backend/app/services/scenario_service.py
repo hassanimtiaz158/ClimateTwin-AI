@@ -30,11 +30,12 @@ class ScenarioService:
             city=config.city,
             country=config.country,
             target_year=config.target_year,
-            renewable_energy_slider=config.renewable_energy_slider,
-            public_transit_slider=config.public_transit_slider,
             reforestation_slider=config.reforestation_slider,
-            carbon_tax_slider=config.carbon_tax_slider,
-            green_innovation_slider=config.green_innovation_slider,
+            renewable_energy_slider=config.renewable_energy_slider,
+            ev_adoption_slider=config.ev_adoption_slider,
+            emission_reduction_slider=config.emission_reduction_slider,
+            public_transit_slider=config.public_transit_slider,
+            water_conservation_slider=config.water_conservation_slider,
             notes=config.notes,
         )
         self.db.add(scenario)

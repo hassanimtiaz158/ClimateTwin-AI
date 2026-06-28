@@ -13,7 +13,6 @@ from app.models.simulation_run import SimulationRun
 from app.models.projection_result import ProjectionResult
 from app.models.scenario import Scenario
 from app.schemas.recommendation import RecommendationResponse, RecommendationAction
-from app.models.scenario import ACTION_IMPACT_TABLE
 
 logger = logging.getLogger(__name__)
 

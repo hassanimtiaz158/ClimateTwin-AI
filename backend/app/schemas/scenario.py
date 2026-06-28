@@ -10,18 +10,7 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
-
-
-# ── Valid climate actions (for backward compatibility) ────────
-VALID_ACTIONS = frozenset({
-    "renewable_energy",
-    "public_transit",
-    "reforestation",
-    "carbon_tax",
-    "waste_reduction",
-    "green_buildings",
-})
+from pydantic import BaseModel, ConfigDict, Field
 
 
 # ── Create ─────────────────────────────────────────────────────
@@ -34,11 +23,12 @@ class ScenarioCreate(BaseModel):
     target_year: int = Field(default=2035, ge=2025, le=2050, description="Projection target year")
 
     # ── Sustainability policy sliders (0.0 - 1.0) ────────────
+    reforestation_slider: float = Field(default=0.0, ge=0.0, le=1.0, description="Tree planting & reforestation effort")
     renewable_energy_slider: float = Field(default=0.0, ge=0.0, le=1.0, description="Renewable energy adoption level")
-    public_transit_slider: float = Field(default=0.0, ge=0.0, le=1.0, description="Public transit investment level")
-    reforestation_slider: float = Field(default=0.0, ge=0.0, le=1.0, description="Reforestation effort level")
-    carbon_tax_slider: float = Field(default=0.0, ge=0.0, le=1.0, description="Carbon tax strength level")
-    green_innovation_slider: float = Field(default=0.0, ge=0.0, le=1.0, description="Green innovation investment level")
+    ev_adoption_slider: float = Field(default=0.0, ge=0.0, le=1.0, description="Electric vehicle adoption rate")
+    emission_reduction_slider: float = Field(default=0.0, ge=0.0, le=1.0, description="Industrial emission reduction strength")
+    public_transit_slider: float = Field(default=0.0, ge=0.0, le=1.0, description="Public transport investment level")
+    water_conservation_slider: float = Field(default=0.0, ge=0.0, le=1.0, description="Water conservation level")
 
     notes: Optional[str] = Field(None, max_length=2000, description="Optional notes")
 
@@ -57,11 +47,12 @@ class ScenarioRead(BaseModel):
     target_year: int
 
     # ── Sustainability policy sliders ─────────────────────────
-    renewable_energy_slider: float
-    public_transit_slider: float
     reforestation_slider: float
-    carbon_tax_slider: float
-    green_innovation_slider: float
+    renewable_energy_slider: float
+    ev_adoption_slider: float
+    emission_reduction_slider: float
+    public_transit_slider: float
+    water_conservation_slider: float
 
     # ── Derived fields (backward compatibility) ───────────────
     region: str
@@ -84,11 +75,12 @@ class ScenarioSummary(BaseModel):
     city: str
     country: str
     target_year: int
-    renewable_energy_slider: float
-    public_transit_slider: float
     reforestation_slider: float
-    carbon_tax_slider: float
-    green_innovation_slider: float
+    renewable_energy_slider: float
+    ev_adoption_slider: float
+    emission_reduction_slider: float
+    public_transit_slider: float
+    water_conservation_slider: float
     region: str
     actions: List[str]
     created_at: datetime
@@ -104,11 +96,12 @@ class ScenarioUpdate(BaseModel):
     target_year: Optional[int] = Field(None, ge=2025, le=2050)
 
     # ── Sustainability policy sliders ─────────────────────────
-    renewable_energy_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
-    public_transit_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
     reforestation_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
-    carbon_tax_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
-    green_innovation_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
+    renewable_energy_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
+    ev_adoption_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
+    emission_reduction_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
+    public_transit_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
+    water_conservation_slider: Optional[float] = Field(None, ge=0.0, le=1.0)
 
     notes: Optional[str] = Field(None, max_length=2000)
 

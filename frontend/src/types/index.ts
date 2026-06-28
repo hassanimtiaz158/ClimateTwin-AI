@@ -3,12 +3,13 @@ export interface ScenarioConfig {
   city: string;
   country: string;
   targetYear: number;
-  renewableEnergySlider: number;
-  publicTransitSlider: number;
   reforestationSlider: number;
-  carbonTaxSlider: number;
-  greenInnovationSlider: number;
-  notes?: string;
+  renewableEnergySlider: number;
+  evAdoptionSlider: number;
+  emissionReductionSlider: number;
+  publicTransitSlider: number;
+  waterConservationSlider: number;
+  notes: string;
 }
 
 export interface Scenario {
@@ -18,11 +19,12 @@ export interface Scenario {
   city: string;
   country: string;
   target_year: number;
-  renewable_energy_slider: number;
-  public_transit_slider: number;
   reforestation_slider: number;
-  carbon_tax_slider: number;
-  green_innovation_slider: number;
+  renewable_energy_slider: number;
+  ev_adoption_slider: number;
+  emission_reduction_slider: number;
+  public_transit_slider: number;
+  water_conservation_slider: number;
   notes?: string;
   // Derived fields (backward compatibility)
   region: string;

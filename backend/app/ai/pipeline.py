@@ -26,34 +26,40 @@ INDICATORS = [
 
 # ── Action Impact Table ───────────────────────────────────────
 ACTION_IMPACT_TABLE = {
+    "reforestation": {
+        "forest_cover": 0.15,
+        "biodiversity_score": 0.10,
+        "co2_level": -0.08,
+        "flood_risk": -0.04,
+        "water_stress": -0.02,
+        "temperature_change": -0.01,
+    },
     "renewable_energy": {
-        "co2_level": -0.15,
+        "co2_level": -0.18,
+        "air_quality_index": -0.10,
+        "temperature_change": -0.025,
+        "heatwave_frequency": -0.03,
+    },
+    "ev_adoption": {
+        "co2_level": -0.12,
         "air_quality_index": -0.08,
-        "temperature_change": -0.02,
+        "temperature_change": -0.01,
+    },
+    "emission_reduction": {
+        "co2_level": -0.22,
+        "air_quality_index": -0.12,
+        "temperature_change": -0.03,
+        "heatwave_frequency": -0.02,
     },
     "public_transit": {
         "co2_level": -0.10,
-        "air_quality_index": -0.05,
-        "temperature_change": -0.01,
+        "air_quality_index": -0.06,
+        "temperature_change": -0.008,
     },
-    "reforestation": {
-        "forest_cover": 0.12,
-        "biodiversity_score": 0.08,
-        "co2_level": -0.05,
-        "flood_risk": -0.03,
-    },
-    "carbon_tax": {
-        "co2_level": -0.20,
-        "temperature_change": -0.025,
-    },
-    "waste_reduction": {
-        "air_quality_index": -0.03,
-        "water_stress": -0.02,
-    },
-    "green_buildings": {
-        "co2_level": -0.08,
-        "temperature_change": -0.01,
-        "heatwave_frequency": -0.05,
+    "water_conservation": {
+        "water_stress": -0.15,
+        "biodiversity_score": 0.05,
+        "flood_risk": -0.02,
     },
 }
 

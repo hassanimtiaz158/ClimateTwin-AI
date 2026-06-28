@@ -31,11 +31,12 @@ async def create_scenario(
     - **city**: Target city (default: "Global")
     - **country**: Target country (default: "Global")
     - **target_year**: Projection target year (2025-2050)
-    - **renewable_energy_slider**: 0.0-1.0
-    - **public_transit_slider**: 0.0-1.0
     - **reforestation_slider**: 0.0-1.0
-    - **carbon_tax_slider**: 0.0-1.0
-    - **green_innovation_slider**: 0.0-1.0
+    - **renewable_energy_slider**: 0.0-1.0
+    - **ev_adoption_slider**: 0.0-1.0
+    - **emission_reduction_slider**: 0.0-1.0
+    - **public_transit_slider**: 0.0-1.0
+    - **water_conservation_slider**: 0.0-1.0
     - **notes**: Optional notes
     """
     service = ScenarioService(db)
@@ -93,11 +94,12 @@ async def update_scenario(
     - **city**: Target city
     - **country**: Target country
     - **target_year**: Projection target year (2025-2050)
-    - **renewable_energy_slider**: 0.0-1.0
-    - **public_transit_slider**: 0.0-1.0
     - **reforestation_slider**: 0.0-1.0
-    - **carbon_tax_slider**: 0.0-1.0
-    - **green_innovation_slider**: 0.0-1.0
+    - **renewable_energy_slider**: 0.0-1.0
+    - **ev_adoption_slider**: 0.0-1.0
+    - **emission_reduction_slider**: 0.0-1.0
+    - **public_transit_slider**: 0.0-1.0
+    - **water_conservation_slider**: 0.0-1.0
     - **notes**: Optional notes
     """
     service = ScenarioService(db)

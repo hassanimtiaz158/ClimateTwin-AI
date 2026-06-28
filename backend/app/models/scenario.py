@@ -18,39 +18,6 @@ from app.database import Base
 from app.types import GUID
 
 
-# ── Action impact mapping (for backward compatibility) ────────
-ACTION_IMPACT_TABLE = {
-    "renewable_energy": {
-        "renewable_energy_slider": 1.0,
-        "co2_emissions": -0.15,
-        "air_quality_index": -0.08,
-    },
-    "public_transit": {
-        "public_transit_slider": 1.0,
-        "co2_emissions": -0.10,
-        "air_quality_index": -0.05,
-    },
-    "reforestation": {
-        "reforestation_slider": 1.0,
-        "forest_cover": 0.12,
-        "biodiversity_score": 0.08,
-    },
-    "carbon_tax": {
-        "carbon_tax_slider": 1.0,
-        "co2_emissions": -0.20,
-        "energy_efficiency": 0.10,
-    },
-    "waste_reduction": {
-        "green_innovation_slider": 0.5,
-        "air_quality_index": -0.03,
-    },
-    "green_buildings": {
-        "energy_efficiency": 0.15,
-        "renewable_energy_slider": 0.3,
-    },
-}
-
-
 class Scenario(Base):
     """A climate scenario configuration."""
 
@@ -74,11 +41,12 @@ class Scenario(Base):
     target_year: Mapped[int] = mapped_column(Integer, nullable=False, default=2035)
 
     # ── Sustainability policy sliders (0.0 - 1.0) ────────────
-    renewable_energy_slider: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
-    public_transit_slider: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     reforestation_slider: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
-    carbon_tax_slider: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
-    green_innovation_slider: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    renewable_energy_slider: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    ev_adoption_slider: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    emission_reduction_slider: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    public_transit_slider: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    water_conservation_slider: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
 
     # ── Metadata ──────────────────────────────────────────────
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
@@ -112,18 +80,18 @@ class Scenario(Base):
 
     @property
     def actions(self) -> list[str]:
-        """Derive active actions from slider values (>= 0.5 threshold)."""
+        """Derive active actions from slider values (>= 0.1 threshold)."""
         active = []
         slider_map = {
-            "renewable_energy": self.renewable_energy_slider,
-            "public_transit": self.public_transit_slider,
             "reforestation": self.reforestation_slider,
-            "carbon_tax": self.carbon_tax_slider,
-            "green_buildings": 1.0 if self.green_innovation_slider >= 0.5 else 0.0,
-            "waste_reduction": 1.0 if self.green_innovation_slider >= 0.3 else 0.0,
+            "renewable_energy": self.renewable_energy_slider,
+            "ev_adoption": self.ev_adoption_slider,
+            "emission_reduction": self.emission_reduction_slider,
+            "public_transit": self.public_transit_slider,
+            "water_conservation": self.water_conservation_slider,
         }
         for action, value in slider_map.items():
-            if value >= 0.5:
+            if value >= 0.1:
                 active.append(action)
         return active
 
