@@ -7,31 +7,10 @@ All settings are loaded from environment variables (or a .env file).
 from __future__ import annotations
 
 import json
-import os
 from functools import lru_cache
-from typing import List
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-
-def _parse_cors(origins: str | list) -> list[str]:
-    """Parse CORS_ORIGINS from JSON string, comma-separated string, or list."""
-    if isinstance(origins, list):
-        return [str(o).strip() for o in origins if str(o).strip()]
-    if isinstance(origins, str):
-        s = origins.strip()
-        # Strip surrounding quotes that some env sources add
-        if (s.startswith('"') and s.endswith('"')) or (s.startswith("'") and s.endswith("'")):
-            s = s[1:-1].strip()
-        if s.startswith("["):
-            try:
-                parsed = json.loads(s)
-                return [str(o).strip() for o in parsed if str(o).strip()]
-            except json.JSONDecodeError:
-                pass
-        return [o.strip() for o in s.split(",") if o.strip()]
-    return []
 
 
 class Settings(BaseSettings):
@@ -73,14 +52,18 @@ class Settings(BaseSettings):
     DEBUG: bool = Field(default=False, description="Toggle debug / dev mode.")
 
     # ── CORS ─────────────────────────────────────────────────
-    CORS_ORIGINS: List[str] = Field(
-        default=[
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "http://127.0.0.1:3000",
-            "http://127.0.0.1:5173",
-        ],
-        description="Origins allowed by CORS. Accepts JSON array, comma-separated string, or individual env var CORS_ORIGINS_0, CORS_ORIGINS_1, etc.",
+    # Declared as str (not list[str]) so pydantic-settings treats it as a
+    # scalar and passes the raw env value through to the validator instead of
+    # calling json.loads() on it. The validator handles JSON arrays,
+    # comma-separated strings, single origins, and None/"" (→ default).
+    CORS_ORIGINS: str = Field(
+        default=(
+            "http://localhost:3000,"
+            "http://localhost:5173,"
+            "http://127.0.0.1:3000,"
+            "http://127.0.0.1:5173"
+        ),
+        description="Origins allowed by CORS. Accepts JSON array, comma-separated string, or a single origin.",
     )
 
     @field_validator("CORS_ORIGINS", mode="before")
@@ -88,7 +71,21 @@ class Settings(BaseSettings):
     def _parse_cors_origins(cls, v: str | list | None) -> list[str]:
         if v is None:
             return []
-        return _parse_cors(v)
+        if isinstance(v, list):
+            return [str(o).strip() for o in v if str(o).strip()]
+        s = str(v).strip()
+        # pydantic-settings may wrap env values in extra quotes
+        if (s.startswith('"') and s.endswith('"')) or (s.startswith("'") and s.endswith("'")):
+            s = s[1:-1].strip()
+        if not s:
+            return []
+        if s.startswith("["):
+            try:
+                parsed = json.loads(s)
+                return [str(o).strip() for o in parsed if str(o).strip()]
+            except json.JSONDecodeError:
+                pass
+        return [o.strip() for o in s.split(",") if o.strip()]
 
     # ── AI / ML ──────────────────────────────────────────────
     MODEL_PATH: str = Field(
