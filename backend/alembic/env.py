@@ -11,16 +11,19 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 # Import Base from app
-from app.database import Base
+from app.database import Base, _to_async_url
 from app.models import *  # noqa: Ensure all models are imported
 
 # Alembic Config object
 config = context.config
 
-# Prefer the Render DATABASE_URL env var over the ini placeholder.
+# Prefer the Render DATABASE_URL env var over the ini placeholder, and
+# rewrite the scheme so Alembic uses the async driver (asyncpg). Without
+# this, ``postgresql://…`` would load psycopg2, which SQLAlchemy's asyncio
+# layer rejects.
 db_url = os.environ.get("DATABASE_URL")
 if db_url:
-    config.set_main_option("sqlalchemy.url", db_url)
+    config.set_main_option("sqlalchemy.url", _to_async_url(db_url))
 
 # Interpret the config file for Python logging
 if config.config_file_name is not None:
