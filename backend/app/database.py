@@ -23,11 +23,24 @@ logger = logging.getLogger(__name__)
 
 # ── URL normalisation ──────────────────────────────────────────
 def _to_async_url(url: str) -> str:
-    """Ensure the database URL uses the async driver."""
-    if url.startswith("postgresql://"):
-        return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    """Ensure the database URL uses an async driver.
+
+    Render (and some other hosts) hand out URLs in any of these forms:
+        postgres://…
+        postgresql://…
+        postgresql+psycopg2://…
+    SQLAlchemy's asyncio layer only accepts ``postgresql+asyncpg://…`` (or
+    ``sqlite+aiosqlite://…``). Strip any non-async driver and rewrite the scheme.
+    """
     if url.startswith("sqlite://"):
         return url.replace("sqlite://", "sqlite+aiosqlite://", 1)
+
+    # Any postgres variant → postgresql+asyncpg://, preserving everything after
+    # the scheme (``://``). Handles postgres://, postgresql://, postgresql+psycopg2://.
+    scheme, sep, rest = url.partition("://")
+    if sep and scheme.startswith("postgres"):
+        return "postgresql+asyncpg://" + rest
+
     return url
 
 

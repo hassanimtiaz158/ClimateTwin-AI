@@ -108,7 +108,17 @@ class Settings(BaseSettings):
     @field_validator("DATABASE_URL")
     @classmethod
     def _validate_db_url(cls, v: str) -> str:
-        allowed = ("postgresql://", "postgresql+asyncpg://", "sqlite://", "sqlite+aiosqlite://")
+        # Accept any postgres variant (postgres://, postgresql://,
+        # postgresql+asyncpg://, postgresql+psycopg2://) — _to_async_url() in
+        # database.py rewrites to the async driver before SQLAlchemy sees it.
+        allowed = (
+            "postgres://",
+            "postgresql://",
+            "postgresql+asyncpg://",
+            "postgresql+psycopg2://",
+            "sqlite://",
+            "sqlite+aiosqlite://",
+        )
         if not v.startswith(allowed):
             msg = f"DATABASE_URL must start with one of {allowed}"
             raise ValueError(msg)
