@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 from functools import lru_cache
+from typing import Any
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -52,17 +53,18 @@ class Settings(BaseSettings):
     DEBUG: bool = Field(default=False, description="Toggle debug / dev mode.")
 
     # ── CORS ─────────────────────────────────────────────────
-    # Declared as str (not list[str]) so pydantic-settings treats it as a
-    # scalar and passes the raw env value through to the validator instead of
-    # calling json.loads() on it. The validator handles JSON arrays,
-    # comma-separated strings, single origins, and None/"" (→ default).
-    CORS_ORIGINS: str = Field(
-        default=(
-            "http://localhost:3000,"
-            "http://localhost:5173,"
-            "http://127.0.0.1:3000,"
-            "http://127.0.0.1:5173"
-        ),
+    # Declared as Any so pydantic-settings does NOT call json.loads() on the
+    # raw env value (which would crash on an empty string) and pydantic does
+    # not reject list inputs. The mode="before" validator below handles every
+    # shape Render/Render's env can produce: JSON array, comma-separated
+    # string, single origin, list, or None/"".
+    CORS_ORIGINS: Any = Field(
+        default=[
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:5173",
+        ],
         description="Origins allowed by CORS. Accepts JSON array, comma-separated string, or a single origin.",
     )
 
